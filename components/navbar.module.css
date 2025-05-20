@@ -1,0 +1,74 @@
+/* Navbar.module.css */
+
+.navbar {
+  background-color: #6A0DAD; /* Dark Purple */
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Inter', sans-serif;
+  color: white;
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #FFFFFF;
+}
+
+.navList {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navItem a {
+  text-decoration: none;
+  color: #FFFFFF;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.navItem a:hover {
+  color: #EAD6FF; /* Light Purple */
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.loginButton {
+  background-color: #CC33CC; /* Pinkish Purple */
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.loginButton:hover {
+  background-color: #E6CCFF;
+  color: #6A0DAD;
+}
+
+.icon {
+  cursor: pointer;
+  color: white;
+  transition: color 0.3s ease;
+}
+
+.icon:hover {
+  color: #EAD6FF;
+}

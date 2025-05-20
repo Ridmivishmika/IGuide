@@ -1,0 +1,144 @@
+/* page.css */
+
+.pastpapers-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+  background-color: #fff;
+}
+
+@media (min-width: 768px) {
+  .pastpapers-container {
+    flex-direction: row;
+  }
+}
+
+.sidebar {
+  min-width: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-top: 1rem;
+}
+
+.sidebar-item {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: 0.2s ease;
+  cursor: pointer;
+}
+
+.sidebar-item:hover {
+  background-color: #f3f4f6;
+}
+
+.sidebar-item.active {
+  background: linear-gradient(to right, #7e22ce, #ec4899);
+  color: white;
+  font-weight: bold;
+}
+
+.main-area {
+  flex: 1;
+}
+
+.search-box {
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.search-box input {
+  width: 100%;
+  max-width: 300px;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.6rem;
+  background-color: #f9fafb;
+  transition: 0.3s;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: #c084fc;
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.2);
+}
+
+.cards-grid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.card {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 1.2rem;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.card h2 {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+}
+
+.card-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.btn {
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.preview {
+  background-color: #f3f4f6;
+  color: #1f2937;
+}
+
+.preview:hover {
+  background-color: #e5e7eb;
+}
+
+.download {
+  background-color: #f3f4f6;
+  color: #1f2937;
+}
+
+.download:hover {
+  background-color: #e5e7eb;
+}
