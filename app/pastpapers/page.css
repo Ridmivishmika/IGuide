@@ -1,5 +1,7 @@
 /* page.css */
-
+.bg{
+  color: #1f2937;
+}
 .pastpapers-container {
   display: flex;
   flex-direction: column;
@@ -70,26 +72,26 @@
   box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.2);
 }
 
-.cards-grid {
+.cardsGrid {
   display: grid;
   gap: 2rem;
   grid-template-columns: 1fr;
 }
 
 @media (min-width: 640px) {
-  .cards-grid {
+  .cardsGrid{
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (min-width: 1024px) {
-  .cards-grid {
+  .cardsGrid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
 .card {
-  background: #ffffff;
+  background: #d28ac7;
   padding: 2rem;
   border-radius: 1.2rem;
   text-align: center;

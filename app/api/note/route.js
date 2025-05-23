@@ -92,11 +92,10 @@
 import formidable from "formidable";
 import cloudinary from "@/lib/cloudinary";
 import fs from "fs";
-import Pastpaper from "@/models/Pastpaper";
 import { connect } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { verifyJwtToken } from "@/lib/jwt";
-
+import Note from "@/models/Note";
 // Disable default body parsing for file uploads
 export const config = {
   api: {
@@ -147,7 +146,7 @@ export async function POST(req) {
         });
 
         // Save to DB
-        const newPastpaper = await Pastpaper.create({
+        const newNote = await Note.create({
           id,
           name,
           level,
@@ -155,10 +154,10 @@ export async function POST(req) {
           pdfUrl: upload.secure_url,
         });
 
-        resolve(NextResponse.json(newPastpaper, { status: 201 }));
+        resolve(NextResponse.json(newNote, { status: 201 }));
       } catch (uploadError) {
         console.error("Upload error:", uploadError);
-        reject(NextResponse.json({ error: "PDF upload failed" }, { status: 500 }));
+        reject(NextResponse.json({ error: "Note upload failed" }, { status: 500 }));
       }
     });
   });
@@ -169,10 +168,10 @@ export async function GET(req) {
   try {
     await connect();
 
-    const pastPapers = await Pastpaper.find(); // You can filter with query params if needed
-    return NextResponse.json(pastPapers, { status: 200 });
+    const notes = await Note.find(); // You can filter with query params if needed
+    return NextResponse.json(notes, { status: 200 });
   } catch (error) {
-    console.error("GET /api/pastpaper error:", error);
+    console.error("GET /api/note error:", error);
     return NextResponse.json(
       { message: "GET error (fetch pastpapers)" },
       { status: 500 }
