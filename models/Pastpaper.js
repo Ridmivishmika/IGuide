@@ -2,11 +2,6 @@ import mongoose from "mongoose";
 
 const PastPaperSchema = new mongoose.Schema(
   {
-    id: {
-      type: Number, // Use Number instead of int
-      required: true,
-      unique: true,
-    },
     name: {
       type: String,
       required: true,
@@ -19,10 +14,16 @@ const PastPaperSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-     pastPaperPdfUrl: {
-      type: String, // URL to the uploaded PDF
-      required: true,
-    },
+    pdf: {
+      id: {
+        type: String,
+        required: true,
+      },
+      url: {
+        type: String,
+        required: true,
+      }
+    }
   },
   { timestamps: true }
 );

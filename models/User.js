@@ -11,29 +11,13 @@ const UserSchema = new mongoose.Schema(
             required: true,
             unique: true
         },
-        password: {
+        user_name: {
             type: String,
             required: true
         },
-        designation: {
+        password: {
             type: String,
-            default: ""
-        },
-        avatar: {
-            type: Object,
-            default: {}
-        },
-        age: {
-            type: String,
-            default: ""
-        },
-        location: {
-            type: String,
-            default: ""
-        },
-        about: {
-            type: String,
-            default: ""
+            required: true
         },
     },
     {timestamps: true}

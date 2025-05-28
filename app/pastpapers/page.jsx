@@ -1,58 +1,58 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import styles from './page.css';
 import { Eye, Download } from "lucide-react";
-import Card from "@/components/card";
+import "./page.css"; // Assuming CSS modules are not being used
 
 const Pastpapers = () => {
   const [pastpapers, setPastpapers] = useState([]);
-  const [selectedLevel, setSelectedLevel] = useState(1); // ✅ Default to Level 1
+  const [selectedLevel, setSelectedLevel] = useState(1); // Default to Level 1
 
   useEffect(() => {
     const fetchPastpapers = async () => {
       try {
         const res = await fetch("http://localhost:3000/api/pastpaper", {
-          cache: "no-store"
+          cache: "no-store",
         });
-        if (!res.ok) {
-          throw new Error("Failed to fetch data");
-        }
+        if (!res.ok) throw new Error("Failed to fetch data");
+
         const data = await res.json();
         setPastpapers(data);
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching past papers:", error);
       }
     };
 
     fetchPastpapers();
   }, []);
 
-  const filteredPapers = pastpapers.filter((paper) => paper.level === selectedLevel); // Always filter based on selectedLevel
+  // Filter based on selected year level
+  const filteredPapers = pastpapers.filter(
+    (paper) => paper.level === selectedLevel
+  );
 
   return (
     <div className="pastpapers-container">
+      {/* Sidebar */}
       <aside className="sidebar">
-        <div
-          className={`sidebar-item ${selectedLevel === 1 ? "active" : ""}`}
-          onClick={() => setSelectedLevel(1)}
-        >
-          1st Year
-        </div>
-        <div
-          className={`sidebar-item ${selectedLevel === 2 ? "active" : ""}`}
-          onClick={() => setSelectedLevel(2)}
-        >
-          2nd Year
-        </div>
-        <div
-          className={`sidebar-item ${selectedLevel === 3 ? "active" : ""}`}
-          onClick={() => setSelectedLevel(3)}
-        >
-          3rd Year
-        </div>
+        {[1, 2, 3].map((level) => (
+          <div
+            key={level}
+            className={`sidebar-item ${
+              selectedLevel === level ? "active" : ""
+            }`}
+            onClick={() => setSelectedLevel(level)}
+          >
+            {level === 1
+              ? "1st Year"
+              : level === 2
+              ? "2nd Year"
+              : "3rd Year"}
+          </div>
+        ))}
       </aside>
 
+      {/* Main content */}
       <main className="main-area">
         <div className="search-box">
           <input type="text" placeholder="Search..." />
@@ -62,24 +62,35 @@ const Pastpapers = () => {
           {filteredPapers.map((paper) => (
             <div key={paper._id} className="card">
               <h2>{paper.name}</h2>
-              <p><strong>Year:</strong> {paper.year}</p>
-              <p><strong>Level:</strong> {paper.level}</p>
+              <p>
+                <strong>Year:</strong> {paper.year}
+              </p>
+              <p>
+                <strong>Level:</strong> {paper.level}
+              </p>
 
-              <div className={styles.cardButtons}>
+              <div className="cardButtons">
+                {/* Preview button */}
                 <a
-                  href={paper.pastPaperPdfUrl}
+                  href="https://res.cloudinary.com/dwq5xfmci/raw/upload/v1748432896/pzdzainuwzgiynesiquo.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${styles.btn} ${styles.preview}`}
+                  className="btn preview"
+                  title="Preview PDF"
                 >
                   <Eye size={18} style={{ marginRight: "0.5rem" }} />
+                  Preview
                 </a>
+
+                {/* Download button */}
                 <a
-                  href={paper.pastPaperPdfUrl}
+                  href="https://res.cloudinary.com/dwq5xfmci/raw/upload/fl_attachment/v1748432896/pzdzainuwzgiynesiquo.pdf"
                   download
-                  className={`${styles.btn} ${styles.download}`}
+                  className="btn download"
+                  title="Download PDF"
                 >
                   <Download size={18} style={{ marginRight: "0.5rem" }} />
+                  Download
                 </a>
               </div>
             </div>
