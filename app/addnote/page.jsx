@@ -10,12 +10,12 @@ const initialState = {
   year: "",
   level: "",
   language: "",
-  pdf: null,
+  noteFile: null,
 };
 
-const AddPastPaper = () => {
-  const CLOUDINARY_CLOUD_NAME = "dwq5xfmci";
-  const UPLOAD_PRESET = "iguide_past_papers";
+const AddNote = () => {
+  const CLOUDINARY_CLOUD_NAME = "dwq5xfmci";      // Keep your cloud name
+  const UPLOAD_PRESET = "iguide_past_papers";           // Change upload preset for notes
 
   const [state, setState] = useState(initialState);
   const [error, setError] = useState("");
@@ -31,15 +31,15 @@ const AddPastPaper = () => {
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
     if (type === "file") {
-      setState({ ...state, pdf: files[0] });
+      setState({ ...state, noteFile: files[0] });
     } else {
       setState({ ...state, [name]: value });
     }
   };
 
-  const uploadPdf = async () => {
+  const uploadNote = async () => {
     const formData = new FormData();
-    formData.append("file", state.pdf);
+    formData.append("file", state.noteFile);
     formData.append("upload_preset", UPLOAD_PRESET);
 
     try {
@@ -51,16 +51,16 @@ const AddPastPaper = () => {
       const data = await res.json();
       return { id: data.public_id, url: data.secure_url };
     } catch (error) {
-      console.error("Upload error:", error);
-      throw new Error("Failed to upload PDF");
+      console.error(error, error);
+      throw new Error("Failed to upload note");
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!state.name || !state.year || !state.language || !state.level || !state.pdf) {
-      setError("All fields including the PDF are required.");
+    if (!state.name || !state.year ||!state.language || !state.level || !state.noteFile) {
+      setError("All fields including the note file are required.");
       return;
     }
 
@@ -69,9 +69,9 @@ const AddPastPaper = () => {
     setSuccess("");
 
     try {
-      const pdf = await uploadPdf();
+      const note = await uploadNote();
 
-      const response = await fetch("/api/pastpaper", {
+      const response = await fetch("/api/note", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -80,20 +80,20 @@ const AddPastPaper = () => {
         body: JSON.stringify({
           name: state.name,
           level: Number(state.level),
-          year: state.year,
-          language: state.language,
-          pdf,
+          year: Number(state.year),
+          language:state.language,
+          note,
         }),
       });
 
       if (response.status === 201) {
-        setSuccess("Past paper added successfully");
+        setSuccess("Note added successfully");
         setTimeout(() => {
           router.refresh();
-          router.push("/pastpapers");
+          router.push("/notes");
         }, 1500);
       } else {
-        setError("Failed to add past paper");
+        setError("Failed to add note");
       }
     } catch (err) {
       setError(err.message);
@@ -104,17 +104,17 @@ const AddPastPaper = () => {
 
   return (
     <div>
-      <h2>Add Past Paper</h2>
+      <h2>Add Note</h2>
       <form onSubmit={handleSubmit}>
         <Input label="Name" type="text" name="name" onChange={handleChange} value={state.name} />
         <Input label="Level" type="number" name="level" onChange={handleChange} value={state.level} />
-        <Input label="Year" type="text" name="year" onChange={handleChange} value={state.year} />
-        <Input label="Language" type="text" name="language" onChange={handleChange} value={state.language} />
+        <Input label="Year" type="number" name="year" onChange={handleChange} value={state.year} />
+        <Input label="Language" type="String" name="language" onChange={handleChange} value={state.language} />
 
-        <label>Upload PDF</label>
-        <input onChange={handleChange} type="file" name="pdf" accept=".pdf" />
+        <label>Upload Note (PDF)</label>
+        <input onChange={handleChange} type="file" name="noteFile" accept=".pdf" />
 
-        {state.pdf && <p>Selected file: {state.pdf.name}</p>}
+        {state.noteFile && <p>Selected file: {state.noteFile.name}</p>}
         {error && <p style={{ color: "red" }}>{error}</p>}
         {success && <p style={{ color: "green" }}>{success}</p>}
 
@@ -126,4 +126,4 @@ const AddPastPaper = () => {
   );
 };
 
-export default AddPastPaper;
+export default AddNote;

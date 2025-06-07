@@ -254,6 +254,7 @@ import { NextResponse } from "next/server";
 import Pastpaper from "@/models/Pastpaper";
 import { connect } from "@/lib/db";
 import { verifyJwtToken } from "@/lib/jwt";
+import { Languages } from "lucide-react";
 
 export async function POST(req) {
   await connect();
@@ -273,9 +274,9 @@ export async function POST(req) {
   try {
     const body = await req.json();
 
-    const { name, level, year, pdf } = body;
+    const { name, level, year,language, pdf } = body;
 
-    if (!name || !year || !level || !pdf?.id || !pdf?.url) {
+    if (!name || !year || !level || !language|| !pdf?.id || !pdf?.url) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
@@ -283,6 +284,7 @@ export async function POST(req) {
       name,
       level,
       year,
+      language,
       pdf,
     });
 

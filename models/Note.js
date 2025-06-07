@@ -29,11 +29,6 @@ import mongoose from "mongoose";
 
 const NoteSchema = new mongoose.Schema(
   {
-    id: {
-      type: Number,
-      required: true,
-      unique: true,
-    },
     name: {
       type: String,
       required: true,
@@ -46,10 +41,20 @@ const NoteSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-     notePdfUrl: {
-      type: String, // URL to the uploaded PDF
+    language: {
+      type: String,
       required: true,
     },
+    note: {
+      id: {
+        type: String,
+        required: true,
+      },
+      url: {
+        type: String,
+        required: true,
+      }
+    }
   },
   { timestamps: true }
 );

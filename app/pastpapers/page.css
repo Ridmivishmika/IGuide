@@ -144,3 +144,20 @@
 .download:hover {
   background-color: #e5e7eb;
 }
+.language-submenu {
+  padding-left: 1rem;
+  margin-top: 0.3rem;
+}
+
+.sidebar-subitem {
+  cursor: pointer;
+  padding: 6px 12px;
+  margin: 4px 0;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+}
+
+.sidebar-subitem.active {
+  background-color: #007bff;
+  color: white;
+}

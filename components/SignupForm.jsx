@@ -67,7 +67,7 @@ const SignupForm = () => {
             if(response?.status === 201){
                 setSuccess("Registratio successful");
                 setTimeout( () =>{
-                    router.push("/login",{scroll:false})
+                    router.push("/admin",{scroll:false})
                 },1000)
             }else{
                 setError("Registration Fail");

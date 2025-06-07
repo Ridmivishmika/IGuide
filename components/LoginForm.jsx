@@ -69,7 +69,7 @@ const LoginForm = () => {
             //     setError("Login Fail");
             // }
 
-           router.push("/pastpapers")
+           router.push("/admin")
         }catch(error){
             console.log(error)
         }

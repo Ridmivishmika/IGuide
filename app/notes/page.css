@@ -1,74 +1,73 @@
-/* Container for whole layout */
-.notes-container,
+/* page.css */
+
 .pastpapers-container {
   display: flex;
-  height: 100vh;
-  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  background: #fff;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-/* Sidebar */
+/* Sidebar styles */
 .sidebar {
-  width: 200px;
-  background-color: #f5f5f5;
+  width: 250px;
+  background-color: #640259;
   padding: 1rem;
-  border-right: 1px solid #ddd;
+  color: white;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar-item {
-  padding: 10px 15px;
-  margin-bottom: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  background-color: transparent;
   cursor: pointer;
-  border-radius: 5px;
-  transition: background 0.2s ease;
-}
-
-.sidebar-item:hover {
-  background-color: #e0e0e0;
+  font-weight: 500;
+  color: #ddd;
+  transition: all 0.3s ease;
 }
 
 .sidebar-item.active {
-  background-color: #007bff;
-  color: white;
+  background-color: #ded2e0;
+  color: #fff;
   font-weight: bold;
 }
 
-/* Main area */
+/* Main content area */
 .main-area {
   flex: 1;
   padding: 2rem;
-  overflow-y: auto;
+  color: white;
 }
 
-.search-box {
-  margin-bottom: 20px;
-}
-
+/* Search bar */
 .search-box input {
   width: 100%;
-  padding: 10px;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  border: none;
+  outline: none;
   font-size: 1rem;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+  background-color: #fff;
+  color: #c9b0b0;
 }
 
-/* Cards grid */
+/* Cards Grid */
 .cardsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.5rem;
+  margin-top: 2rem;
 }
 
-/* Individual card */
+/* Card styles */
 .card {
-  background-color: #ffffff;
+  background-color: #640259;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
-  transition: transform 0.2s ease;
-}
-
-.card:hover {
-  transform: translateY(-5px);
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .card h2 {
@@ -77,64 +76,157 @@
 }
 
 .card p {
-  margin: 0.25rem 0;
+  font-size: 0.95rem;
+  margin: 0.3rem 0;
 }
 
-/* Card buttons */
+/* Buttons */
 .cardButtons {
-  display: flex;
-  justify-content: flex-start;
   margin-top: 1rem;
-  gap: 10px;
+  display: flex;
+  gap: 1rem;
 }
 
 .btn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
   text-decoration: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
+  color: white;
   font-weight: 500;
-  transition: background-color 0.2s ease;
-  border: none;
+  transition: background-color 0.3s;
+}
+
+.btn.preview {
+  background-color: #6a1b9a;
+}
+
+.btn.preview:hover {
+  background-color: #8e24aa;
+}
+
+.btn.download {
+  background-color: #00796b;
+}
+
+.btn.download:hover {
+  background-color: #009688;
+}
+/* page.css */
+
+.pastpapers-container {
+  display: flex;
+  min-height: 100vh;
+  font-family: sans-serif;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 200px;
+  background-color: #640259;
+  padding: 1rem;
+  color: white;
+}
+
+.sidebar-item {
+  margin: 1rem 0;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.sidebar-item.active {
+  color: #C43EC3;
+}
+
+.language-submenu {
+  padding-left: 1rem;
+}
+
+.sidebar-subitem {
+  margin-top: 0.5rem;
   cursor: pointer;
 }
 
-.preview {
-  background-color: #d0ebff;
-  color: #004085;
+.sidebar-subitem.active {
+  color: #C43EC3;
 }
 
-.download {
-  background-color: #d3f9d8;
-  color: #155724;
+/* Main content */
+.main-area {
+  flex: 1;
+  padding: 2rem;
+  background: #f8f8f8;
 }
 
-.preview:hover {
-  background-color: #b3e5fc;
+/* Search */
+.search-box input {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 2px solid #640259;
+  border-radius: 5px;
+  margin-bottom: 1rem;
 }
 
-.download:hover {
-  background-color: #b2f2bb;
+/* Cards */
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
 }
 
-/* Responsive design */
-@media (max-width: 768px) {
-  .notes-container,
-  .pastpapers-container {
-    flex-direction: column;
-  }
+.card.custom-card {
+  background-color: #640259;
+  color: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
 
-  .sidebar {
-    width: 100%;
-    display: flex;
-    justify-content: space-around;
-    border-right: none;
-    border-bottom: 1px solid #ddd;
-  }
+/* Watermark effect */
+.card .watermark {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 5rem;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+  user-select: none;
+}
 
-  .main-area {
-    padding: 1rem;
-  }
+/* Buttons */
+.cardButtons {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.btn {
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  transition: 0.3s ease;
+}
+
+.btn.preview {
+  background-color: #C43EC3;
+  color: white;
+}
+
+.btn.download {
+  background-color: teal;
+  color: white;
+}
+
+.btn:hover {
+  opacity: 0.9;
 }

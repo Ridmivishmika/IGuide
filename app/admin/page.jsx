@@ -1,10 +1,10 @@
-import AddPastPaper from "@/components/AddPastPaper";
+// import AddPastPaper from "@/components/AddPastPaper";
 import React from "react";
 
 const AdminDashboard = () =>{
     return(
         <div>
-            <AddPastPaper/>
+            {/* <AddPastPaper/> */}
         </div>
     )
 }
