@@ -1,107 +1,115 @@
-"use client"
-import React ,{useEffect,useState}from "react";
-import Input from './Input'
+"use client";
+
+import React, { useEffect, useState } from "react";
+import Input from "./Input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import './LoginForm.module.css'
+import styles from "./LoginForm.module.css";
+
 
 const initialState = {
-    email:"",
-    password:""
-}
+  email: "",
+  password: ""
+};
+
 const LoginForm = () => {
+  const [state, setState] = useState(initialState);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const [hydrated, setHydrated] = useState(false);
 
-    const [state,setState] = useState(initialState);
-    const [error,setError] = useState("");
-    const [success,setSuccess] = useState("");
-    const [isLoading,setisLoading] = useState(false);
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
 
-    const router = useRouter();
-      const [hydrated,setHydrated] = useState(false)
-    
-        useEffect(() =>{
-            setHydrated(true)
-        },[])
-    
-        if(!hydrated){
-            return null;
-        }
-    const handleChange = (event) =>{
-        setError("");
-        setState({...state,[event.target.name]:event.target.value})
+  if (!hydrated) {
+    return null;
+  }
+
+  const handleChange = (event) => {
+    setError("");
+    setState({ ...state, [event.target.name]: event.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const { email, password } = state;
+
+    if (!email || !password) {
+      setError("All fields are required");
+      return;
     }
 
-    const handleSubmit = async(e) =>{
-        e.preventDefault();
+    const pattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 
-        const {email,password} = state;
-
-        if( !email ||  !password){
-            setError("All feiled is required");
-            return;
-        }
-
-        const pattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-z]{2,4}/;
-
-        if(!pattern.test(email)){
-            setError("Enter valid email");
-            return;
-        }
-
-        try{
-            setisLoading(true);
-         
-           const res = await signIn("credentials",{
-            email,password,redirect:false
-           })
-
-           if(res?.error){
-            setError("Invalid credential")
-            setisLoading(false)
-            return;
-           }
-            // if(res?.status === 201){
-            //     setSuccess("Registratio successful");
-            //     setTimeout( () =>{
-            //         router.push("/pastpapers")
-            //     },1000)
-            // }else{
-            //     setError("Login Fail");
-            // }
-
-           router.push("/admin")
-        }catch(error){
-            console.log(error)
-        }
-
-        setisLoading(false);
+    if (!pattern.test(email)) {
+      setError("Enter a valid email");
+      return;
     }
 
-    return(
-        
-        <div>
-            <h2>Login </h2>
-                <section>
-                    <form  onSubmit={handleSubmit}>
-                        <Input label="Email" type="text" name="email" onChange={handleChange} value={state.email}/>
-                        <Input label="Password" type="password" name="password" onChange={handleChange} value={state.password}/>
-                         {
-                            error && <div>{error}</div>
-                        }
+    try {
+      setIsLoading(true);
 
-                        {
-                            success && <div>{success}</div>
-                        }
-                        <button type="submit">    
-                            {isLoading? "Loading" : "Login"}
-                        </button>
-                        <p>Haven't Account</p>
-                        <Link href={"/signup"}>Signup</Link>
-                    </form>
-                </section>
-        </div>
-    )
-}
+      const res = await signIn("credentials", {
+        email,
+        password,
+        redirect: false
+      });
+
+      if (res?.error) {
+        setError("Invalid credentials");
+        setIsLoading(false);
+        return;
+      }
+
+      router.push("/addnote");
+    } catch (error) {
+      console.error(error);
+      setError("Something went wrong");
+    }
+
+    setIsLoading(false);
+  };
+
+  return (
+  <div className={styles['note-page-container']}>
+  <h2>Login</h2>
+  <section>
+    <form onSubmit={handleSubmit}>
+      <Input
+        label="Email"
+        type="text"
+        name="email"
+        onChange={handleChange}
+        value={state.email}
+      />
+      <Input
+        label="Password"
+        type="password"
+        name="password"
+        onChange={handleChange}
+        value={state.password}
+      />
+
+      {error && <p className={styles['error-message']}>{error}</p>}
+      {success && <p className={styles['success-message']}>{success}</p>}
+
+      <button type="submit">{isLoading ? "Loading" : "Login"}</button>
+      <p>
+        Haven't Account?
+        <Link href="/signup" className={styles.link}>
+          Signup
+        </Link>
+      </p>
+    </form>
+  </section>
+</div>
+
+  );
+};
 
 export default LoginForm;

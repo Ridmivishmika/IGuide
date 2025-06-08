@@ -1,5 +1,3 @@
-/* page.css */
-
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background: #f9f9f9;
@@ -11,6 +9,35 @@ h2 {
   text-align: center;
   color: #640259;
   margin-top: 2rem;
+}
+
+.note-page-container {
+  padding: 1rem;
+}
+
+.note-header {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.note-header button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #640259;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.note-header button:hover {
+  background-color: #4a0143;
 }
 
 form {
@@ -32,17 +59,9 @@ label {
 input[type="text"],
 input[type="number"],
 input[type="file"],
-input[type="String"] {
+input[type="String"],
+select {
   width: 100%;
-  padding: 0.75rem;
-  margin-top: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-}
-
-select{
-   width: 100%;
   padding: 0.75rem;
   margin-top: 0.5rem;
   border: 1px solid #ddd;
@@ -83,6 +102,59 @@ p[style*="color: red"] {
 
 p[style*="color: green"] {
   color: #1ba94c !important;
+}
+
+.note-list {
+  max-width: 700px;
+  margin: 2rem auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.note-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.note-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid #eee;
+  padding: 0.75rem 0;
+}
+
+.note-item p {
+  margin: 0;
+  font-weight: 500;
+  flex: 1;
+}
+
+.note-item a {
+  color: #640259;
+  font-weight: bold;
+  margin-right: 1rem;
+  text-decoration: none;
+}
+
+.note-item a:hover {
+  text-decoration: underline;
+}
+
+.note-item button {
+  background: transparent;
+  border: none;
+  color: #640259;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: color 0.2s ease;
+}
+
+.note-item button:hover {
+  color: #c43ec3;
 }
 
 ::selection {

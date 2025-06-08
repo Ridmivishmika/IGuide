@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Input from './Input'
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import styles from './SignupForm.module.css';
 
 const initialState = {
     name:"",
@@ -79,30 +80,29 @@ const SignupForm = () => {
         setisLoading(false);
     }
     return(
-        <div>
-            <h2>Sign Up </h2>
-                <section>
-                    <form onSubmit={handleSubmit}>
-                        <Input label="Name" type="text" name="name" onChange={handleChange} value={state.name}/>
-                        <Input label="Email" type="text" name="email"  onChange={handleChange} value={state.email}/>
-                        <Input label="User Name" type="text" name="user_name"  onChange={handleChange} value={state.user_name}/>
-                        <Input label="Password" type="password" name="password"  onChange={handleChange} value={state.password}/>
+      <div className={styles['signup-page-container']}>
+  <h2>Sign Up</h2>
+  <section className={styles['signup-form-section']}>
+    <form onSubmit={handleSubmit}>
+      <Input label="Name" type="text" name="name" onChange={handleChange} value={state.name} />
+      <Input label="Email" type="text" name="email" onChange={handleChange} value={state.email} />
+      <Input label="User Name" type="text" name="user_name" onChange={handleChange} value={state.user_name} />
+      <Input label="Password" type="password" name="password" onChange={handleChange} value={state.password} />
 
-                        {
-                            error && <div>{error}</div>
-                        }
+      {error && <div className={styles['signup-error-message']}>{error}</div>}
+      {success && <div className={styles['signup-success-message']}>{success}</div>}
 
-                        {
-                            success && <div>{success}</div>
-                        }
-                        <button type="submit">
-                            {isLoading? "Loading" : "Signup"}
-                        </button>
-                        <p>Already a user ?</p>
-                        <Link href={"/login"}>Login</Link>
-                    </form>
-                </section>
-        </div>
+      <button type="submit">
+        {isLoading ? "Loading" : "Signup"}
+      </button>
+      <p>
+        Already a user?
+        <Link href={"/login"} className={styles.link}>Login</Link>
+      </p>
+    </form>
+  </section>
+</div>
+
     )
 }
 

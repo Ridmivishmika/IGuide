@@ -6,11 +6,10 @@ import { authOptions } from "../api/auth/[...nextauth]/route";
 
 const Signup = async() =>{
 
-    const session = await getServerSession(authOptions)
-    if(session) redirect("/admin")
+    // const session = await getServerSession(authOptions)
+    // if(session) redirect("/signup")
     return(
         <div>
-            Signup        
             <SignupForm/>
         </div>
     )

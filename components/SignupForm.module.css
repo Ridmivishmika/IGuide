@@ -1,18 +1,18 @@
-/* LoginForm.module.css */
+/* SignupForm.module.css or global CSS */
 
-.note-page-container {
+.signup-page-container {
   padding: 1rem;
   background: #f9f9f9;
   min-height: 100vh;
 }
 
-.note-page-container h2 {
+.signup-page-container h2 {
   text-align: center;
   color: #640259;
   margin-top: 2rem;
 }
 
-.note-page-container section {
+.signup-form-section {
   max-width: 450px;
   margin: 2rem auto;
   background-color: white;
@@ -21,22 +21,22 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
-.note-page-container form {
+.signup-form-section form {
   display: flex;
   flex-direction: column;
 }
 
-.note-page-container label {
+.signup-form-section label {
   font-weight: bold;
   color: #640259;
   margin-top: 1rem;
 }
 
-.note-page-container input[type="text"],
-.note-page-container input[type="password"],
-.note-page-container input[type="email"],
-.note-page-container input[type="number"],
-.note-page-container select {
+.signup-form-section input[type="text"],
+.signup-form-section input[type="password"],
+.signup-form-section input[type="email"],
+.signup-form-section input[type="number"],
+.signup-form-section select {
   width: 100%;
   padding: 0.75rem;
   margin-top: 0.5rem;
@@ -46,7 +46,7 @@
   box-sizing: border-box;
 }
 
-.note-page-container button[type="submit"] {
+.signup-form-section button[type="submit"] {
   margin-top: 1.5rem;
   padding: 0.75rem;
   background-color: #640259;
@@ -59,18 +59,18 @@
   transition: background-color 0.3s ease;
 }
 
-.note-page-container button[type="submit"]:hover {
+.signup-form-section button[type="submit"]:hover {
   background-color: #4a0143;
 }
 
-.note-page-container p {
+.signup-form-section p {
   margin-top: 1rem;
   font-size: 0.95rem;
   text-align: center;
   color: #640259;
 }
 
-.note-page-container a {
+.signup-form-section a {
   color: #640259;
   font-weight: bold;
   text-decoration: none;
@@ -78,19 +78,19 @@
   transition: color 0.3s ease;
 }
 
-.note-page-container a:hover {
+.signup-form-section a:hover {
   color: #c43ec3;
   text-decoration: underline;
 }
 
-.note-page-container p.error-message {
+.signup-error-message {
   color: #d00000;
   margin-top: 1rem;
   font-weight: 600;
   text-align: center;
 }
 
-.note-page-container p.success-message {
+.signup-success-message {
   color: #1ba94c;
   margin-top: 1rem;
   font-weight: 600;

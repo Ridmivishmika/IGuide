@@ -31,7 +31,6 @@ const Navbar = () => {
           <li className={styles.navItem}><Link href="/referencebooks">Reference Books</Link></li>
 
 
-          {/* ✅ Show login/signup only on /admin and not logged in */}
           {!isLoggedIn && isAdminRoute && (
             <>
               <li className={styles.navItem}><Link href="/login">Login</Link></li>

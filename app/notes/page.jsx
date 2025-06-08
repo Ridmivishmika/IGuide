@@ -222,14 +222,14 @@ const Notes = () => {
 
       {/* Main */}
       <main className="main-area">
-        <div className="search-box">
+        {/* <div className="search-box">
           <input
             type="text"
             placeholder="Search notes..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-        </div>
+        </div> */}
 
         <div className="cardsGrid">
           {filteredNotes.length === 0 && selectedLanguage && (
@@ -250,9 +250,7 @@ const Notes = () => {
                   <span className="card-year">{note.year}</span>
                 </div>
 
-                <p><strong>Level:</strong> {note.level}</p>
-                <p><strong>Language:</strong> {note.language}</p>
-
+               
                 <div className="cardButtons">
                   <a
                     href={previewUrl}
