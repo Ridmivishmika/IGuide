@@ -4,6 +4,7 @@ import Input from './Input'
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import './LoginForm.module.css'
 
 const initialState = {
     email:"",

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Input from "@/components/Input";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-
+import './page.css'
 const initialState = {
   name: "",
   year: "",
@@ -107,10 +107,20 @@ const AddNote = () => {
       <h2>Add Note</h2>
       <form onSubmit={handleSubmit}>
         <Input label="Name" type="text" name="name" onChange={handleChange} value={state.name} />
-        <Input label="Level" type="number" name="level" onChange={handleChange} value={state.level} />
-        <Input label="Year" type="number" name="year" onChange={handleChange} value={state.year} />
-        <Input label="Language" type="String" name="language" onChange={handleChange} value={state.language} />
-
+ <select name="level" value={state.level} onChange={handleChange}>
+    <option value="">Select level</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+  </select>       
+   <Input label="Year" type="number" name="year" onChange={handleChange} value={state.year} />
+<label htmlFor="Language">Language</label>
+  <select name="language" value={state.language} onChange={handleChange}>
+    <option value="">Select Language</option>
+    <option value="1">Sinhala</option>
+    <option value="2">English</option>
+    <option value="3">Tamil</option>
+  </select>
         <label>Upload Note (PDF)</label>
         <input onChange={handleChange} type="file" name="noteFile" accept=".pdf" />
 

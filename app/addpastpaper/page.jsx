@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Input from "@/components/Input";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import './page.css'
 
 const initialState = {
   name: "",
@@ -105,23 +106,37 @@ const AddPastPaper = () => {
   return (
     <div>
       <h2>Add Past Paper</h2>
-      <form onSubmit={handleSubmit}>
-        <Input label="Name" type="text" name="name" onChange={handleChange} value={state.name} />
-        <Input label="Level" type="number" name="level" onChange={handleChange} value={state.level} />
-        <Input label="Year" type="text" name="year" onChange={handleChange} value={state.year} />
-        <Input label="Language" type="text" name="language" onChange={handleChange} value={state.language} />
+     <form onSubmit={handleSubmit}>
+  <Input label="Name" type="text" name="name" onChange={handleChange} value={state.name} />
+  
+  <label htmlFor="level">Level</label>
+  <select name="level" value={state.level} onChange={handleChange}>
+    <option value="">Select level</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+  </select>
 
-        <label>Upload PDF</label>
-        <input onChange={handleChange} type="file" name="pdf" accept=".pdf" />
+  <Input label="Year" type="text" name="year" onChange={handleChange} value={state.year} />
+  <label htmlFor="Language">Language</label>
+  <select name="language" value={state.language} onChange={handleChange}>
+    <option value="">Select Language</option>
+    <option value="1">Sinhala</option>
+    <option value="2">English</option>
+    <option value="3">Tamil</option>
+  </select>
+  <label>Upload PDF</label>
+  <input onChange={handleChange} type="file" name="pdf" accept=".pdf" />
+  
+  {state.pdf && <p>Selected file: {state.pdf.name}</p>}
+  {error && <p style={{ color: "red" }}>{error}</p>}
+  {success && <p style={{ color: "green" }}>{success}</p>}
 
-        {state.pdf && <p>Selected file: {state.pdf.name}</p>}
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        {success && <p style={{ color: "green" }}>{success}</p>}
+  <button type="submit" disabled={isLoading}>
+    {isLoading ? "Uploading..." : "Add"}
+  </button>
+</form>
 
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? "Uploading..." : "Add"}
-        </button>
-      </form>
     </div>
   );
 };

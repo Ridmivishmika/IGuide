@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import './page.css'
 
 const News = () => {
   const [formData, setFormData] = useState({

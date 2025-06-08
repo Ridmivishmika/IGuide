@@ -1,0 +1,126 @@
+/* Overall Layout */
+.news-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem;
+  background-color: #ffffff;
+}
+
+@media (min-width: 768px) {
+  .news-page {
+    flex-direction: row;
+  }
+}
+
+/* Main News Area */
+.news-main {
+  flex: 4;
+}
+
+.news-search {
+  margin-bottom: 1rem;
+}
+
+.news-search input {
+  width: 100%;
+  max-width: 60%;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid #640259;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.news-search input:focus {
+  border-color: #C43EC3;
+  box-shadow: 0 0 0 2px rgba(196, 62, 195, 0.3);
+}
+
+/* News Cards */
+.news-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .news-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.news-card {
+  border: 2px solid #640259;
+  padding: 1rem;
+  border-radius: 10px;
+  background-color: #fdf9fd;
+  box-shadow: 0 2px 6px rgba(100, 2, 89, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.news-card:hover {
+  box-shadow: 0 4px 12px rgba(100, 2, 89, 0.2);
+}
+
+.news-card h2 {
+  font-size: 1.25rem;
+  color: #640259;
+  margin-bottom: 0.5rem;
+}
+
+.news-card p {
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.news-card strong {
+  color: #C43EC3;
+}
+
+/* Sidebar Ads */
+.news-ads {
+  flex: 1;
+}
+
+.news-ads h3 {
+  font-size: 1.125rem;
+  font-weight: bold;
+  color: #640259;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #C43EC3;
+  padding-bottom: 0.25rem;
+}
+
+.ad-card {
+  border: 2px solid #640259;
+  border-radius: 10px;
+  padding: 0.75rem;
+  background-color: #f9f5fa;
+  box-shadow: 0 2px 6px rgba(100, 2, 89, 0.08);
+  transition: box-shadow 0.3s ease;
+}
+
+.ad-card:hover {
+  box-shadow: 0 4px 10px rgba(100, 2, 89, 0.15);
+}
+
+.ad-card h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #640259;
+  margin-bottom: 0.5rem;
+}
+
+.ad-card img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.no-data {
+  padding: 1rem;
+  color: #777;
+  font-style: italic;
+}

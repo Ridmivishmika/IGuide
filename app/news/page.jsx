@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import "./page.css";
 
 const News = () => {
   const [newsList, setNewsList] = useState([]);
   const [adsList, setAdsList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Fetch news and ads
   useEffect(() => {
     const fetchNews = async () => {
       try {
@@ -30,7 +30,6 @@ const News = () => {
         });
         if (!res.ok) throw new Error("Failed to fetch ads");
         const data = await res.json();
-        console.log(data)
         setAdsList(data);
       } catch (error) {
         console.error("Error fetching ads:", error);
@@ -41,7 +40,6 @@ const News = () => {
     fetchAds();
   }, []);
 
-  // Filtered news based on search
   const filteredNews = newsList.filter(
     (news) =>
       news.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -49,25 +47,24 @@ const News = () => {
   );
 
   return (
-    <div className="flex flex-col md:flex-row gap-6 p-4">
+    <div className="news-page">
       {/* Main news content */}
-      <main className="flex-1">
-        <div className="mb-4">
+      <main className="news-main">
+        <div className="news-search">
           <input
             type="text"
             placeholder="Search news..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="border p-2 rounded w-full md:w-1/2"
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="news-grid">
           {filteredNews.length > 0 ? (
             filteredNews.map((news) => (
-              <div key={news._id} className="border p-4 rounded shadow">
-                <h2 className="text-xl font-semibold mb-2">{news.name}</h2>
-                <p className="mb-2">
+              <div key={news._id} className="news-card">
+                <h2>{news.name}</h2>
+                <p>
                   <strong>Description:</strong> {news.description}
                 </p>
                 <p>
@@ -76,18 +73,18 @@ const News = () => {
               </div>
             ))
           ) : (
-            <p>No news found.</p>
+            <p className="no-data">No news found.</p>
           )}
         </div>
       </main>
 
       {/* Sidebar with Ads */}
-      <aside className="w-full md:w-72 space-y-4">
-        <h3 className="text-lg font-bold mb-2">Sponsored Ads</h3>
+      <aside className="news-ads">
+        <h3>Sponsored Ads</h3>
         {adsList.length > 0 ? (
           adsList.map((ad) => (
-            <div key={ad._id} className="border p-3 rounded shadow">
-              <h4 className="font-semibold mb-2">{ad.name}</h4>
+            <div key={ad._id} className="ad-card">
+              <h4>{ad.name}</h4>
               {ad.image?.url ? (
                 <Image
                   src={ad.image.url}
@@ -97,12 +94,12 @@ const News = () => {
                   className="rounded object-cover w-full h-auto"
                 />
               ) : (
-                <p className="text-sm text-gray-500">No image available</p>
+                <p className="no-data">No image available</p>
               )}
             </div>
           ))
         ) : (
-          <p>No ads available.</p>
+          <p className="no-data">No ads available.</p>
         )}
       </aside>
     </div>

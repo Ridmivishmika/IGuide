@@ -28,6 +28,8 @@ const Navbar = () => {
           <li className={styles.navItem}><Link href="/pastpapers">Past Papers</Link></li>
           <li className={styles.navItem}><Link href="/news">News</Link></li>
           <li className={styles.navItem}><Link href="/notes">Notes</Link></li>
+          <li className={styles.navItem}><Link href="/referencebooks">Reference Books</Link></li>
+
 
           {/* ✅ Show login/signup only on /admin and not logged in */}
           {!isLoggedIn && isAdminRoute && (
@@ -41,9 +43,11 @@ const Navbar = () => {
           {isLoggedIn && (
             <>
               <li className={styles.navItem}><Link href="/addnote">Add Note</Link></li>
-              <li className={styles.navItem}><Link href="/addads">Add Ad</Link></li>
+              <li className={styles.navItem}><Link href="/addad">Add Ad</Link></li>
               <li className={styles.navItem}><Link href="/addpastpaper">Add Past Paper</Link></li>
               <li className={styles.navItem}><Link href="/addnews">Add News</Link></li>
+              <li className={styles.navItem}><Link href="/addreferencebook">Add referencebooks</Link></li>
+
               <li
                 className={styles.navItem}
                 onClick={handleSignOut}

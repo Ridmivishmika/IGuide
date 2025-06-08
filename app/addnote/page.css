@@ -31,24 +31,25 @@ label {
 
 input[type="text"],
 input[type="number"],
-input[type="file"] {
+input[type="file"],
+input[type="String"] {
   width: 100%;
   padding: 0.75rem;
   margin-top: 0.5rem;
   border: 1px solid #ddd;
   border-radius: 0.5rem;
   font-size: 1rem;
-  box-sizing: border-box;
 }
+
 select{
-  width: 100%;
+   width: 100%;
   padding: 0.75rem;
   margin-top: 0.5rem;
   border: 1px solid #ddd;
   border-radius: 0.5rem;
   font-size: 1rem;
-  box-sizing: border-box;
 }
+
 input[type="file"] {
   padding: 0.4rem;
 }
@@ -67,13 +68,8 @@ button[type="submit"] {
   transition: background-color 0.3s ease;
 }
 
-button[type="submit"]:hover:not(:disabled) {
+button[type="submit"]:hover {
   background-color: #4a0143;
-}
-
-button[type="submit"]:disabled {
-  background-color: #aa7aad;
-  cursor: not-allowed;
 }
 
 p {

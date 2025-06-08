@@ -15,6 +15,15 @@
   align-items: center;
   gap: 1.5rem;
 }
+.active {
+  font-weight: bold;
+  color: #640259;
+  background-color: #f9e7ff;
+  border-radius: 10px;
+  padding: 0.3rem 0.7rem;
+  box-shadow: 0 4px 8px rgba(100, 2, 89, 0.2);
+  transition: all 0.2s ease-in-out;
+}
 
 .logo {
   font-size: 1.5rem;
