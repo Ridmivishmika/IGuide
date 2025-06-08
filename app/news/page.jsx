@@ -8,11 +8,15 @@ const News = () => {
   const [newsList, setNewsList] = useState([]);
   const [adsList, setAdsList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const backendUrl =
+  process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000';
+
+
 
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/news", {
+        const res = await fetch(`${backendUrl}/api/news`, {
           cache: "no-store",
         });
         if (!res.ok) throw new Error("Failed to fetch news");
@@ -25,7 +29,7 @@ const News = () => {
 
     const fetchAds = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/ads", {
+        const res = await fetch(`${backendUrl}/api/ads`, {
           cache: "no-store",
         });
         if (!res.ok) throw new Error("Failed to fetch ads");

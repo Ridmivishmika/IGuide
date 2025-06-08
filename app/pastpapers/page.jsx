@@ -8,11 +8,12 @@ const Pastpapers = () => {
   const [pastpapers, setPastpapers] = useState([]);
   const [selectedLevel, setSelectedLevel] = useState(1);
   const [selectedLanguage, setSelectedLanguage] = useState("Sinhala");
+ const backendUrl =  process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000';
 
   useEffect(() => {
     const fetchPastpapers = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/pastpaper", {
+        const res = await fetch(`${backendUrl}/api/pastpaper`, {
           cache: "no-store",
         });
         if (!res.ok) throw new Error("Failed to fetch data");

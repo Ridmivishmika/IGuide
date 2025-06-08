@@ -151,11 +151,11 @@ const Notes = () => {
   const [selectedLevel, setSelectedLevel] = useState(1);
   const [selectedLanguage, setSelectedLanguage] = useState("Sinhala");
   const [searchTerm, setSearchTerm] = useState("");
-
+ const backendUrl =  process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000';
   useEffect(() => {
     const fetchNotes = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/note", {
+        const res = await fetch(`${backendUrl}/api/note`, {
           cache: "no-store",
         });
         if (!res.ok) throw new Error("Failed to fetch notes");
