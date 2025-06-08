@@ -1,24 +1,25 @@
-import Pastpaper from "@/models/Pastpaper";
+import Ad from "@/models/Ad"; // Adjust the path if needed
 import { connect } from "@/lib/db";
 import { NextResponse } from "next/server";
 
-// GET by ID
+// GET Ad by ID
 export async function GET(req, { params }) {
   await connect();
   try {
-    // Use findById for MongoDB _id
-    const paper = await Pastpaper.findById(params.id);
-    if (!paper) return NextResponse.json({ message: "Not found" }, { status: 404 });
-    return NextResponse.json(paper, { status: 200 });
+    const ad = await Ad.findById(params.id);
+    if (!ad) return NextResponse.json({ message: "Not found" }, { status: 404 });
+    return NextResponse.json(ad, { status: 200 });
   } catch (error) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
+
+// PATCH Ad by ID
 export async function PATCH(req, { params }) {
   await connect();
   try {
     const updates = await req.json();
-    const updated = await Pastpaper.findByIdAndUpdate(params.id, updates, { new: true });
+    const updated = await Ad.findByIdAndUpdate(params.id, updates, { new: true });
     if (!updated) return NextResponse.json({ message: "Not found" }, { status: 404 });
     return NextResponse.json(updated, { status: 200 });
   } catch (error) {
@@ -26,13 +27,12 @@ export async function PATCH(req, { params }) {
   }
 }
 
-
-// UPDATE by ID (PUT or PATCH)
+// PUT Ad by ID
 export async function PUT(req, { params }) {
   await connect();
   try {
     const updates = await req.json();
-    const updated = await Pastpaper.findByIdAndUpdate(params.id, updates, { new: true });
+    const updated = await Ad.findByIdAndUpdate(params.id, updates, { new: true });
     if (!updated) return NextResponse.json({ message: "Not found" }, { status: 404 });
     return NextResponse.json(updated, { status: 200 });
   } catch (error) {
@@ -40,11 +40,11 @@ export async function PUT(req, { params }) {
   }
 }
 
-// DELETE by ID
+// DELETE Ad by ID
 export async function DELETE(req, { params }) {
   await connect();
   try {
-    const deleted = await Pastpaper.findByIdAndDelete(params.id);
+    const deleted = await Ad.findByIdAndDelete(params.id);
     if (!deleted) return NextResponse.json({ message: "Not found" }, { status: 404 });
     return NextResponse.json({ message: "Deleted successfully" }, { status: 200 });
   } catch (error) {

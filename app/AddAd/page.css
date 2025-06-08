@@ -1,81 +1,27 @@
-/* page.css */
-
-body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: #f9f9f9;
-  margin: 0;
-  padding: 0;
+.ad-card {
+  border: 1px solid #eee;
+  border-radius: 1rem;
+  padding: 1rem;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-.container {
-  background-color: white;
-  margin: 3rem auto;
-  padding: 2rem;
-  border-radius: 1.5rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-}
-
-h2 {
-  text-align: center;
-  font-size: 1.75rem;
-  color: #640259;
-}
-
-.special-word {
-  color: #C43EC3;
-}
-
-input[type="text"],
-input[type="file"] {
-  width: 100%;
-  padding: 0.75rem;
-  margin-top: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-}
-
-label {
-  color: #333;
-  font-weight: 500;
-}
-
-img {
-  margin-top: 1rem;
-  border-radius: 0.5rem;
-  max-width: 100%;
+.ad-card img {
+  width: 100px;
   height: auto;
-}
-
-button.btn {
-  width: 100%;
-  padding: 0.75rem;
-  margin-top: 1rem;
-  background-color: #640259;
-  color: white;
-  border: none;
   border-radius: 0.5rem;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  object-fit: cover;
 }
 
-button.btn:hover {
-  background-color: #4a0143;
+.ad-details {
+  flex: 1;
 }
 
-.text-red-600 {
-  color: red;
-  margin-top: 0.5rem;
-}
-
-.text-green-600 {
-  color: green;
-  margin-top: 0.5rem;
-}
-
-::selection {
-  background: #C43EC3;
-  color: white;
+.ad-actions {
+  display: flex;
+  gap: 0.5rem;
 }

@@ -1,6 +1,6 @@
 "use client";
-import React, { useState } from "react";
-import './page.css'
+import React, { useState, useEffect } from "react";
+import "./page.css";
 
 const News = () => {
   const [formData, setFormData] = useState({
@@ -9,11 +9,27 @@ const News = () => {
     description: "",
   });
 
+  const [newsList, setNewsList] = useState([]);
+
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
+  };
+
+  const fetchNews = async () => {
+    try {
+      const res = await fetch("/api/news");
+      if (res.ok) {
+        const data = await res.json();
+        setNewsList(data);
+      } else {
+        console.error("Failed to fetch news");
+      }
+    } catch (err) {
+      console.error("Error fetching news:", err);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -31,9 +47,9 @@ const News = () => {
       });
 
       if (res.ok) {
-        const result = await res.json();
         alert("News added successfully!");
-        console.log(result);
+        setFormData({ id: "", name: "", description: "" });
+        fetchNews(); // refresh list
       } else {
         console.error("Failed to add news");
       }
@@ -42,8 +58,12 @@ const News = () => {
     }
   };
 
+  useEffect(() => {
+    fetchNews();
+  }, []);
+
   return (
-    <div>
+    <div className="news-container">
       <h2>Add News</h2>
       <form onSubmit={handleSubmit}>
         <input
@@ -74,6 +94,21 @@ const News = () => {
         <br />
         <button type="submit">Add News</button>
       </form>
+
+      <div className="news-list">
+        <h2>Existing News</h2>
+        {newsList.length === 0 ? (
+          <p className="no-news">No news added yet.</p>
+        ) : (
+          newsList.map((news) => (
+            <div key={news._id} className="news-card">
+              <h3>{news.name}</h3>
+              <p>{news.description}</p>
+              <span className="news-id">ID: {news.id}</span>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 };

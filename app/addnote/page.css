@@ -11,42 +11,27 @@ h2 {
   margin-top: 2rem;
 }
 
-.note-page-container {
-  padding: 1rem;
-}
-
-.note-header {
+.container {
   display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 2rem;
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex-wrap: wrap;
 }
 
-.note-header button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: #640259;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.note-header button:hover {
-  background-color: #4a0143;
+.form-section,
+.list-section {
+  flex: 1;
+  min-width: 350px;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 form {
-  max-width: 450px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background-color: white;
-  border-radius: 1rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
 }
 
 label {
@@ -59,7 +44,6 @@ label {
 input[type="text"],
 input[type="number"],
 input[type="file"],
-input[type="String"],
 select {
   width: 100%;
   padding: 0.75rem;
@@ -67,6 +51,7 @@ select {
   border: 1px solid #ddd;
   border-radius: 0.5rem;
   font-size: 1rem;
+  box-sizing: border-box;
 }
 
 input[type="file"] {
@@ -87,8 +72,13 @@ button[type="submit"] {
   transition: background-color 0.3s ease;
 }
 
-button[type="submit"]:hover {
+button[type="submit"]:hover:not(:disabled) {
   background-color: #4a0143;
+}
+
+button[type="submit"]:disabled {
+  background-color: #aa7aad;
+  cursor: not-allowed;
 }
 
 p {
@@ -97,67 +87,73 @@ p {
 }
 
 p[style*="color: red"] {
-  color: #d00000 !important;
+  color: #640259 !important;
 }
 
 p[style*="color: green"] {
-  color: #1ba94c !important;
-}
-
-.note-list {
-  max-width: 700px;
-  margin: 2rem auto;
-  background: white;
-  padding: 2rem;
-  border-radius: 1rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-}
-
-.note-list ul {
-  list-style: none;
-  padding: 0;
-}
-
-.note-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  border-bottom: 1px solid #eee;
-  padding: 0.75rem 0;
-}
-
-.note-item p {
-  margin: 0;
-  font-weight: 500;
-  flex: 1;
-}
-
-.note-item a {
-  color: #640259;
-  font-weight: bold;
-  margin-right: 1rem;
-  text-decoration: none;
-}
-
-.note-item a:hover {
-  text-decoration: underline;
-}
-
-.note-item button {
-  background: transparent;
-  border: none;
-  color: #640259;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: color 0.2s ease;
-}
-
-.note-item button:hover {
-  color: #c43ec3;
+  color: #640259 !important;
 }
 
 ::selection {
-  background: #C43EC3;
+  background: #640259;
   color: white;
+}
+
+/* List Section Styles */
+.list-section {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.list-section h3 {
+  color: #640259;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.list-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.list-section li {
+  background: #f6f0f9;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.list-section li b {
+  color: #640259;
+}
+
+.list-section a {
+  color: #640259;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.list-section a:hover {
+  text-decoration: underline;
+}
+
+.list-section button {
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  background-color: #640259;
+  color: white;
+  border: none;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  margin-right: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
 }

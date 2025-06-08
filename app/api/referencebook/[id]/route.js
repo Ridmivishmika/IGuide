@@ -1,4 +1,4 @@
-import Pastpaper from "@/models/Pastpaper";
+import ReferenceBook from "@/models/ReferenceBook";
 import { connect } from "@/lib/db";
 import { NextResponse } from "next/server";
 
@@ -6,19 +6,20 @@ import { NextResponse } from "next/server";
 export async function GET(req, { params }) {
   await connect();
   try {
-    // Use findById for MongoDB _id
-    const paper = await Pastpaper.findById(params.id);
-    if (!paper) return NextResponse.json({ message: "Not found" }, { status: 404 });
-    return NextResponse.json(paper, { status: 200 });
+    const book = await ReferenceBook.findById(params.id);
+    if (!book) return NextResponse.json({ message: "Not found" }, { status: 404 });
+    return NextResponse.json(book, { status: 200 });
   } catch (error) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
+
+// PATCH by ID (Partial update)
 export async function PATCH(req, { params }) {
   await connect();
   try {
     const updates = await req.json();
-    const updated = await Pastpaper.findByIdAndUpdate(params.id, updates, { new: true });
+    const updated = await ReferenceBook.findByIdAndUpdate(params.id, updates, { new: true });
     if (!updated) return NextResponse.json({ message: "Not found" }, { status: 404 });
     return NextResponse.json(updated, { status: 200 });
   } catch (error) {
@@ -26,13 +27,12 @@ export async function PATCH(req, { params }) {
   }
 }
 
-
-// UPDATE by ID (PUT or PATCH)
+// PUT by ID (Full update - optional if needed)
 export async function PUT(req, { params }) {
   await connect();
   try {
     const updates = await req.json();
-    const updated = await Pastpaper.findByIdAndUpdate(params.id, updates, { new: true });
+    const updated = await ReferenceBook.findByIdAndUpdate(params.id, updates, { new: true });
     if (!updated) return NextResponse.json({ message: "Not found" }, { status: 404 });
     return NextResponse.json(updated, { status: 200 });
   } catch (error) {
@@ -44,7 +44,7 @@ export async function PUT(req, { params }) {
 export async function DELETE(req, { params }) {
   await connect();
   try {
-    const deleted = await Pastpaper.findByIdAndDelete(params.id);
+    const deleted = await ReferenceBook.findByIdAndDelete(params.id);
     if (!deleted) return NextResponse.json({ message: "Not found" }, { status: 404 });
     return NextResponse.json({ message: "Deleted successfully" }, { status: 200 });
   } catch (error) {
