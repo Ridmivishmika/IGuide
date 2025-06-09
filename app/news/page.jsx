@@ -54,14 +54,14 @@ const News = () => {
     <div className="news-page">
       {/* Main news content */}
       <main className="news-main">
-        <div className="news-search">
+        {/* <div className="news-search">
           <input
             type="text"
             placeholder="Search news..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-        </div>
+        </div> */}
 
         <div className="news-grid">
           {filteredNews.length > 0 ? (
@@ -71,9 +71,9 @@ const News = () => {
                 <p>
                   <strong>Description:</strong> {news.description}
                 </p>
-                <p>
+                {/* <p>
                   <strong>Date:</strong> {news.date || "N/A"}
-                </p>
+                </p> */}
               </div>
             ))
           ) : (

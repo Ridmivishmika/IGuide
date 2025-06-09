@@ -1,3 +1,4 @@
+import Footer from "@/components/footer";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -11,6 +12,7 @@ export default function Home() {
 
         Our aim is not only to support academic success but to nurture the next generation of advocates, scholars, and leaders in law.
       </p>
+      <Footer/>
     </div>
   );
 }

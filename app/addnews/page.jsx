@@ -66,7 +66,7 @@ const News = () => {
     <div className="news-container">
       <h2>Add News</h2>
       <form onSubmit={handleSubmit}>
-        <input
+        {/* <input
           type="number"
           name="id"
           placeholder="ID"
@@ -74,7 +74,7 @@ const News = () => {
           onChange={handleChange}
           required
         />
-        <br />
+        <br /> */}
         <input
           type="text"
           name="name"

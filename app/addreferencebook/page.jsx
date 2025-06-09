@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Input from "@/components/Input";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import "./page.css";
 
@@ -25,16 +25,38 @@ const ReferenceBookPage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editIdFromParams = searchParams.get("editId");
+
   const { data: session, status } = useSession();
 
   useEffect(() => {
+    if (editIdFromParams) {
+      fetchReferenceBookById(editIdFromParams);
+      setEditingId(editIdFromParams);
+    }
     fetchBooks();
-  }, []);
+  }, [editIdFromParams]);
 
   const fetchBooks = async () => {
     const res = await fetch("/api/referencebook");
     const data = await res.json();
     setBooks(data);
+  };
+
+  const fetchReferenceBookById = async (id) => {
+    try {
+      const res = await fetch(`/api/referencebook/${id}`);
+      const data = await res.json();
+      setState({
+        name: data.name,
+        level: data.level,
+        description: data.description,
+        referenceBook: null, // PDF won't be refilled
+      });
+    } catch (error) {
+      setError("Failed to load reference book data for editing.");
+    }
   };
 
   const handleChange = (e) => {
@@ -106,6 +128,7 @@ const ReferenceBookPage = () => {
         setState(initialState);
         setEditingId(null);
         fetchBooks();
+        router.push("/referencebooks");
       } else {
         setError("Something went wrong");
       }
@@ -116,84 +139,31 @@ const ReferenceBookPage = () => {
     setIsLoading(false);
   };
 
-  const handleEdit = (book) => {
-    setEditingId(book._id);
-    setState({
-      name: book.name,
-      level: book.level,
-      description: book.description,
-      referenceBook: null,
-    });
-  };
-
-  const handleDelete = async (id) => {
-    const confirmed = confirm("Are you sure you want to delete this book?");
-    if (!confirmed) return;
-
-    const res = await fetch(`/api/referencebook/${id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${session?.user?.accessToken}`,
-      },
-    });
-
-    if (res.ok) {
-      fetchBooks();
-    }
-  };
-
   if (status === "loading") return <p>Loading...</p>;
   if (status === "unauthenticated") return <p>Access denied</p>;
 
   return (
-    
-  <div className="referencebook-page">
-    {/* Left: Add / Edit Reference Book */}
-    <div className="referencebook-form-card">
-      <h2 className="section-title">
-        {editingId ? "Update Reference Book" : "Add Reference Book"}
-      </h2>
-      <form onSubmit={handleSubmit} className="form-container">
-        <Input label="Name" type="text" name="name" onChange={handleChange} value={state.name} />
-        <Input label="Level" type="number" name="level" onChange={handleChange} value={state.level} />
-        <Input label="Description" type="text" name="description" onChange={handleChange} value={state.description} />
-        <label>Upload Reference Book (PDF)</label>
-        <input type="file" name="referenceBook" accept=".pdf" onChange={handleChange} />
-        {state.referenceBook && <p>Selected file: {state.referenceBook.name}</p>}
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        {success && <p style={{ color: "green" }}>{success}</p>}
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? "Processing..." : editingId ? "Update" : "Add"}
-        </button>
-      </form>
-    </div>
-
-    {/* Right: Existing Reference Books */}
-    <div className="referencebook-list-card">
-      <h2 className="section-title">Existing Reference Books</h2>
-      <div className="referencebook-list">
-        {books.length === 0 ? (
-          <p>No reference books found.</p>
-        ) : (
-          books.map((book) => (
-            <div key={book._id} className="book-card">
-              <h4>{book.name}</h4>
-              <p><strong>Level:</strong> {book.level}</p>
-              <p><strong>Description:</strong> {book.description}</p>
-              <a href={book.referenceBook?.url} target="_blank" rel="noopener noreferrer">View PDF</a>
-              <div className="actions">
-                <button onClick={() => handleEdit(book)}>Edit</button>
-                <button onClick={() => handleDelete(book._id)}>Delete</button>
-              </div>
-            </div>
-          ))
-        )}
+    <div className="referencebook-page">
+      <div className="referencebook-form-card">
+        <h2 className="section-title">
+          {editingId ? "Update Reference Book" : "Add Reference Book"}
+        </h2>
+        <form onSubmit={handleSubmit} className="form-container">
+          <Input label="Name" type="text" name="name" onChange={handleChange} value={state.name} />
+          <Input label="Level" type="number" name="level" onChange={handleChange} value={state.level} />
+          <Input label="Description" type="text" name="description" onChange={handleChange} value={state.description} />
+          <label>Upload Reference Book (PDF)</label>
+          <input type="file" name="referenceBook" accept=".pdf" onChange={handleChange} />
+          {state.referenceBook && <p>Selected file: {state.referenceBook.name}</p>}
+          {error && <p style={{ color: "red" }}>{error}</p>}
+          {success && <p style={{ color: "green" }}>{success}</p>}
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? "Processing..." : editingId ? "Update" : "Add"}
+          </button>
+        </form>
       </div>
     </div>
-  </div>
-);
-
-  
+  );
 };
 
 export default ReferenceBookPage;

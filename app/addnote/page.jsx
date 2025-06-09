@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Input from "@/components/Input";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import "./page.css";
 
@@ -28,14 +28,30 @@ const AddNote = () => {
 
   const router = useRouter();
   const { data: session, status } = useSession();
+  const searchParams = useSearchParams();
+  const editIdFromQuery = searchParams.get("editId");
 
+  // Fetch notes when authenticated
   useEffect(() => {
-    if (status === "authenticated") fetchNotes();
+    if (status === "authenticated") {
+      fetchNotes();
+    }
   }, [status]);
+
+  // After notes are fetched, if editIdFromQuery exists, start editing that note
+  useEffect(() => {
+    if (notes.length > 0 && editIdFromQuery) {
+      const noteToEdit = notes.find((note) => note._id === editIdFromQuery);
+      if (noteToEdit) {
+        startEditing(noteToEdit);
+      }
+    }
+  }, [notes, editIdFromQuery]);
 
   const fetchNotes = async () => {
     try {
       const res = await fetch("/api/note");
+      if (!res.ok) throw new Error("Failed to fetch notes");
       const data = await res.json();
       setNotes(data);
     } catch (err) {
@@ -145,32 +161,32 @@ const AddNote = () => {
     setIsLoading(false);
   };
 
-  const handleDelete = async (id) => {
-    setDeletingId(id);
-    setError("");
-    setSuccess("");
+  // const handleDelete = async (id) => {
+  //   setDeletingId(id);
+  //   setError("");
+  //   setSuccess("");
 
-    try {
-      const res = await fetch(`/api/note/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${session?.user?.accessToken}`,
-        },
-      });
+  //   try {
+  //     const res = await fetch(`/api/note/${id}`, {
+  //       method: "DELETE",
+  //       headers: {
+  //         Authorization: `Bearer ${session?.user?.accessToken}`,
+  //       },
+  //     });
 
-      if (res.ok) {
-        setSuccess("Note deleted successfully");
-        fetchNotes();
-      } else {
-        setError("Failed to delete note");
-      }
-    } catch (err) {
-      setError("An error occurred while deleting");
-      console.error(err);
-    }
+  //     if (res.ok) {
+  //       setSuccess("Note deleted successfully");
+  //       fetchNotes();
+  //     } else {
+  //       setError("Failed to delete note");
+  //     }
+  //   } catch (err) {
+  //     setError("An error occurred while deleting");
+  //     console.error(err);
+  //   }
 
-    setDeletingId(null);
-  };
+  //   setDeletingId(null);
+  // };
 
   const startEditing = (note) => {
     setEditingId(note._id);
@@ -259,13 +275,15 @@ const AddNote = () => {
         </form>
       </div>
 
-      <div className="list-section">
+      {/* <div className="list-section">
         <h3>Existing Notes</h3>
         <ul>
           {notes.map((note) => (
             <li key={note._id}>
-              <b>{note.name}</b> ({note.year})<br />
-              Level: {note.level}<br />
+              <b>{note.name}</b> ({note.year})
+              <br />
+              Level: {note.level}
+              <br />
               Language: {note.language}
               <br />
               <a href={note.note.url} target="_blank" rel="noopener noreferrer">
@@ -306,7 +324,7 @@ const AddNote = () => {
             </li>
           ))}
         </ul>
-      </div>
+      </div> */}
     </div>
   );
 };

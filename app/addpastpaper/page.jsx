@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Input from "@/components/Input";
-import { useRouter } from "next/navigation";
+import Input from "@/components/Input"; // Assuming you have this reusable component
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import "./page.css";
 
@@ -11,7 +11,7 @@ const initialState = {
   year: "",
   level: "",
   language: "",
-  pdf: null,
+  pdfFile: null,
 };
 
 const AddPastPaper = () => {
@@ -23,23 +23,38 @@ const AddPastPaper = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [deletingId, setDeletingId] = useState(null);
-  const [editingId, setEditingId] = useState(null); // <-- Track editing paper ID
+  const [editingId, setEditingId] = useState(null);
 
   const router = useRouter();
   const { data: session, status } = useSession();
+  const searchParams = useSearchParams();
+  const editIdFromQuery = searchParams.get("editId");
 
+  // Fetch existing past papers on auth
   useEffect(() => {
-    if (status === "authenticated") fetchPapers();
+    if (status === "authenticated") {
+      fetchPapers();
+    }
   }, [status]);
+
+  // Start editing if editId query present
+  useEffect(() => {
+    if (papers.length > 0 && editIdFromQuery) {
+      const paperToEdit = papers.find((p) => p._id === editIdFromQuery);
+      if (paperToEdit) {
+        startEditing(paperToEdit);
+      }
+    }
+  }, [papers, editIdFromQuery]);
 
   const fetchPapers = async () => {
     try {
       const res = await fetch("/api/pastpaper");
+      if (!res.ok) throw new Error("Failed to fetch past papers");
       const data = await res.json();
       setPapers(data);
     } catch (err) {
-      console.error("Fetch papers error:", err);
+      console.error(err);
       setError("Failed to load past papers");
     }
   };
@@ -47,15 +62,16 @@ const AddPastPaper = () => {
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
     if (type === "file") {
-      setState({ ...state, pdf: files[0] });
+      setState({ ...state, pdfFile: files[0] });
     } else {
       setState({ ...state, [name]: value });
     }
   };
 
+  // Upload PDF to Cloudinary raw upload
   const uploadPdf = async () => {
     const formData = new FormData();
-    formData.append("file", state.pdf);
+    formData.append("file", state.pdfFile);
     formData.append("upload_preset", UPLOAD_PRESET);
 
     const res = await fetch(
@@ -76,12 +92,11 @@ const AddPastPaper = () => {
     e.preventDefault();
 
     if (!state.name || !state.year || !state.language || !state.level) {
-      setError("Name, Year, Language, and Level are required.");
+      setError("Please fill in all required fields.");
       return;
     }
 
-    // For adding, PDF is required. For editing, PDF is optional (only upload if changed)
-    if (!editingId && !state.pdf) {
+    if (!editingId && !state.pdfFile) {
       setError("PDF file is required for new past papers.");
       return;
     }
@@ -92,23 +107,21 @@ const AddPastPaper = () => {
 
     try {
       let pdfData = null;
-      // Upload PDF only if new file selected (for editing, it's optional)
-      if (state.pdf && typeof state.pdf !== "string") {
+      if (state.pdfFile && typeof state.pdfFile !== "string") {
         pdfData = await uploadPdf();
       }
 
       const payload = {
         name: state.name,
         level: Number(state.level),
-        year: state.year,
+        year: Number(state.year),
         language: state.language,
-        pdf: pdfData ? pdfData : editingId ? undefined : null, // If editing and no new PDF, keep existing
+        pdf: pdfData ? pdfData : editingId ? undefined : null,
       };
 
       let response;
 
       if (editingId) {
-        // PATCH request to update existing past paper
         response = await fetch(`/api/pastpaper/${editingId}`, {
           method: "PATCH",
           headers: {
@@ -118,7 +131,6 @@ const AddPastPaper = () => {
           body: JSON.stringify(payload),
         });
       } else {
-        // POST request to add new past paper
         response = await fetch("/api/pastpaper", {
           method: "POST",
           headers: {
@@ -142,37 +154,10 @@ const AddPastPaper = () => {
       }
     } catch (err) {
       setError(err.message);
-      console.error("Submit error:", err);
-    }
-
-    setIsLoading(false);
-  };
-
-  const handleDelete = async (id) => {
-    setDeletingId(id);
-    setError("");
-    setSuccess("");
-
-    try {
-      const res = await fetch(`/api/pastpaper/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${session?.user?.accessToken}`,
-        },
-      });
-
-      if (res.ok) {
-        setSuccess("Past paper deleted successfully");
-        fetchPapers();
-      } else {
-        setError("Failed to delete past paper");
-      }
-    } catch (err) {
-      setError("An error occurred while deleting");
       console.error(err);
     }
 
-    setDeletingId(null);
+    setIsLoading(false);
   };
 
   const startEditing = (paper) => {
@@ -182,7 +167,7 @@ const AddPastPaper = () => {
       year: paper.year,
       level: String(paper.level),
       language: paper.language,
-      pdf: paper.pdf.url, // Keep current pdf URL as string (not a File)
+      pdfFile: paper.pdf.url, // Keep current PDF URL as string for display
     });
     setError("");
     setSuccess("");
@@ -213,7 +198,7 @@ const AddPastPaper = () => {
             <option value="3">3</option>
           </select>
 
-          <Input label="Year" type="text" name="year" onChange={handleChange} value={state.year} />
+          <Input label="Year" type="number" name="year" onChange={handleChange} value={state.year} />
 
           <label htmlFor="language">Language</label>
           <select name="language" value={state.language} onChange={handleChange} required>
@@ -224,14 +209,13 @@ const AddPastPaper = () => {
           </select>
 
           <label>Upload PDF {editingId ? "(leave empty to keep current)" : ""}</label>
-          <input onChange={handleChange} type="file" name="pdf" accept=".pdf" />
+          <input onChange={handleChange} type="file" name="pdfFile" accept=".pdf" />
 
-          {/* Show file name or existing PDF link */}
-          {state.pdf && typeof state.pdf !== "string" && <p>Selected file: {state.pdf.name}</p>}
-          {editingId && typeof state.pdf === "string" && (
+          {state.pdfFile && typeof state.pdfFile !== "string" && <p>Selected file: {state.pdfFile.name}</p>}
+          {editingId && typeof state.pdfFile === "string" && (
             <p>
               Current PDF:{" "}
-              <a href={state.pdf} target="_blank" rel="noopener noreferrer">
+              <a href={state.pdfFile} target="_blank" rel="noopener noreferrer">
                 View PDF
               </a>
             </p>
@@ -261,53 +245,6 @@ const AddPastPaper = () => {
             </button>
           )}
         </form>
-      </div>
-
-      <div className="list-section">
-        <h3>Existing Past Papers</h3>
-        <ul>
-          {papers.map((paper) => (
-            <li key={paper._id}>
-              <b>{paper.name}</b> ({paper.year})<br />
-              Level: {paper.level}<br/> Language: {paper.language}<br />
-              <a href={paper.pdf.url} target="_blank" rel="noopener noreferrer">
-                View PDF
-              </a>
-              <br />
-              <button
-                onClick={() => handleDelete(paper._id)}
-                disabled={deletingId === paper._id}
-                style={{
-                  marginTop: "0.5rem",
-                  padding: "0.4rem 0.8rem",
-                  backgroundColor: "#640259",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "0.4rem",
-                  cursor: "pointer",
-                  marginRight: "0.5rem",
-                }}
-              >
-                {deletingId === paper._id ? "Deleting..." : "Delete"}
-              </button>
-              <button
-                onClick={() => startEditing(paper)}
-                disabled={isLoading}
-                style={{
-                  marginTop: "0.5rem",
-                  padding: "0.4rem 0.8rem",
-                  backgroundColor: "#640259",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "0.4rem",
-                  cursor: "pointer",
-                }}
-              >
-                Edit
-              </button>
-            </li>
-          ))}
-        </ul>
       </div>
     </div>
   );

@@ -1,30 +1,62 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Eye, Download } from "lucide-react";
+import { Eye, Download, Trash2, Pencil } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import "./page.css";
 
 const ReferenceBooks = () => {
   const [referenceBooks, setReferenceBooks] = useState([]);
   const [selectedLevel, setSelectedLevel] = useState(1);
 
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000';
+
   useEffect(() => {
-    const fetchReferenceBooks = async () => {
-      try {
-        const res = await fetch("/api/referencebook", {
-          cache: "no-store",
-        });
-        if (!res.ok) throw new Error("Failed to fetch reference books");
-        const data = await res.json();
-        setReferenceBooks(data);
-      } catch (error) {
-        console.error("Error fetching reference books:", error);
-      }
-    };
     fetchReferenceBooks();
   }, []);
 
-  // Filter by level only
+  const fetchReferenceBooks = async () => {
+    try {
+      const res = await fetch(`${backendUrl}/api/referencebook`, {
+        cache: "no-store",
+      });
+      if (!res.ok) throw new Error("Failed to fetch reference books");
+      const data = await res.json();
+      setReferenceBooks(data);
+    } catch (error) {
+      console.error("Error fetching reference books:", error);
+    }
+  };
+
+  const deleteReferenceBook = async (id) => {
+    const confirmDelete = confirm("Are you sure you want to delete this reference book?");
+    if (!confirmDelete) return;
+
+    try {
+      const res = await fetch(`${backendUrl}/api/referencebook/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.user?.accessToken}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Delete failed");
+
+      setReferenceBooks((prevBooks) => prevBooks.filter((book) => book._id !== id));
+    } catch (error) {
+      console.error("Error deleting reference book:", error);
+    }
+  };
+
+  const editReferenceBook = (id) => {
+    router.push(`/addreferencebook?editId=${id}`);
+  };
+
   const filteredBooks = referenceBooks.filter(
     (book) => Number(book.level) === Number(selectedLevel)
   );
@@ -66,8 +98,9 @@ const ReferenceBooks = () => {
                     className="btn preview"
                     title="Preview PDF"
                   >
-                    <Eye color="#640259" size={18} style={{ marginRight: "0.5rem" }} />
+                    <Eye size={18} />
                   </a>
+
                   <a
                     href={
                       book.referenceBook?.url
@@ -78,8 +111,28 @@ const ReferenceBooks = () => {
                     className="btn download"
                     title="Download PDF"
                   >
-                    <Download color="#640259" size={18} style={{ marginRight: "0.5rem" }} />
+                    <Download size={18} />
                   </a>
+
+                  {status === "authenticated" && (
+                    <>
+                      <button
+                        className="btn delete"
+                        onClick={() => deleteReferenceBook(book._id)}
+                        title="Delete Reference Book"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+
+                      <button
+                        className="btn edit"
+                        onClick={() => editReferenceBook(book._id)}
+                        title="Edit Reference Book"
+                      >
+                        <Pencil size={18} />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))

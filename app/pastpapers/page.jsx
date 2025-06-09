@@ -1,14 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Eye, Download } from "lucide-react";
+import { Eye, Download, Trash2, Pencil } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import "./page.css";
 
 const Pastpapers = () => {
   const [pastpapers, setPastpapers] = useState([]);
   const [selectedLevel, setSelectedLevel] = useState(1);
   const [selectedLanguage, setSelectedLanguage] = useState("Sinhala");
- const backendUrl =  process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000';
+
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000";
 
   useEffect(() => {
     const fetchPastpapers = async () => {
@@ -24,7 +30,32 @@ const Pastpapers = () => {
       }
     };
     fetchPastpapers();
-  }, []);
+  }, [backendUrl]);
+
+  const deletePaper = async (id) => {
+    const confirmDelete = confirm("Are you sure you want to delete this paper?");
+    if (!confirmDelete) return;
+
+    try {
+      const res = await fetch(`${backendUrl}/api/pastpaper/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.user?.accessToken}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Delete failed");
+
+      setPastpapers((prev) => prev.filter((paper) => paper._id !== id));
+    } catch (error) {
+      console.error("Error deleting paper:", error);
+    }
+  };
+
+  const editPaper = (id) => {
+    router.push(`/addpastpaper?editId=${id}`);
+  };
 
   const filteredPapers = pastpapers.filter(
     (paper) =>
@@ -42,7 +73,7 @@ const Pastpapers = () => {
               className={`sidebar-item ${selectedLevel === level ? "active" : ""}`}
               onClick={() => {
                 setSelectedLevel(level);
-                setSelectedLanguage("");
+                setSelectedLanguage("Sinhala");
               }}
             >
               {level === 1 ? "1st Year" : level === 2 ? "2nd Year" : "3rd Year"}
@@ -66,10 +97,6 @@ const Pastpapers = () => {
 
       {/* Main content */}
       <main className="main-area">
-        {/* <div className="search-box">
-          <input type="text" placeholder="Search..." />
-        </div> */}
-
         <div className="cardsGrid">
           {filteredPapers.length > 0 ? (
             filteredPapers.map((paper) => (
@@ -89,7 +116,7 @@ const Pastpapers = () => {
                     className="btn preview"
                     title="Preview PDF"
                   >
-                    <Eye color="  #640259" size={18} style={{ marginRight: "0.5rem" }} />
+                    <Eye color="#640259" size={18} style={{ marginRight: "0.5rem" }} />
                   </a>
                   <a
                     href={
@@ -101,8 +128,28 @@ const Pastpapers = () => {
                     className="btn download"
                     title="Download PDF"
                   >
-                    <Download color="  #640259"  size={18} style={{ marginRight: "0.5rem"  }} />
+                    <Download color="#640259" size={18} style={{ marginRight: "0.5rem" }} />
                   </a>
+
+                  {status === "authenticated" && (
+                    <>
+                      <button
+                        className="btn delete"
+                        onClick={() => deletePaper(paper._id)}
+                        title="Delete Paper"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+
+                      <button
+                        className="btn edit"
+                        onClick={() => editPaper(paper._id)}
+                        title="Edit Paper"
+                      >
+                        <Pencil size={18} />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))
