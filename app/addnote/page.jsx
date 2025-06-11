@@ -31,12 +31,14 @@ const AddNote = () => {
   const searchParams = useSearchParams();
   const editIdFromQuery = searchParams.get("editId");
 
+  // Fetch notes when authenticated
   useEffect(() => {
     if (status === "authenticated") {
       fetchNotes();
     }
   }, [status]);
 
+  // After notes are fetched, if editIdFromQuery exists, start editing that note
   useEffect(() => {
     if (notes.length > 0 && editIdFromQuery) {
       const noteToEdit = notes.find((note) => note._id === editIdFromQuery);
@@ -94,6 +96,7 @@ const AddNote = () => {
       return;
     }
 
+    // For new note, file is required; for editing, optional
     if (!editingId && !state.noteFile) {
       setError("Note file is required for new notes.");
       return;
@@ -120,7 +123,7 @@ const AddNote = () => {
       let response;
 
       if (editingId) {
-        response = await fetch(`/api/note/${editingId}`, {
+        response = await fetch("/api/note/${editingId}", {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
@@ -133,7 +136,7 @@ const AddNote = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${session?.user?.accessToken}`,
+            Authorization:`Bearer ${session?.user?.accessToken}`,
           },
           body: JSON.stringify(payload),
         });
@@ -158,6 +161,33 @@ const AddNote = () => {
     setIsLoading(false);
   };
 
+  // const handleDelete = async (id) => {
+  //   setDeletingId(id);
+  //   setError("");
+  //   setSuccess("");
+
+  //   try {
+  //     const res = await fetch(/api/note/${id}, {
+  //       method: "DELETE",
+  //       headers: {
+  //         Authorization: Bearer ${session?.user?.accessToken},
+  //       },
+  //     });
+
+  //     if (res.ok) {
+  //       setSuccess("Note deleted successfully");
+  //       fetchNotes();
+  //     } else {
+  //       setError("Failed to delete note");
+  //     }
+  //   } catch (err) {
+  //     setError("An error occurred while deleting");
+  //     console.error(err);
+  //   }
+
+  //   setDeletingId(null);
+  // };
+
   const startEditing = (note) => {
     setEditingId(note._id);
     setState({
@@ -165,7 +195,7 @@ const AddNote = () => {
       year: note.year,
       level: String(note.level),
       language: note.language,
-      noteFile: note.note.url,
+      noteFile: note.note.url, // Keep current note URL as string (not a File)
     });
     setError("");
     setSuccess("");
@@ -244,11 +274,59 @@ const AddNote = () => {
           )}
         </form>
       </div>
+
+      {/* <div className="list-section">
+        <h3>Existing Notes</h3>
+        <ul>
+          {notes.map((note) => (
+            <li key={note._id}>
+              <b>{note.name}</b> ({note.year})
+              <br />
+              Level: {note.level}
+              <br />
+              Language: {note.language}
+              <br />
+              <a href={note.note.url} target="_blank" rel="noopener noreferrer">
+                View Note
+              </a>
+              <br />
+              <button
+                onClick={() => handleDelete(note._id)}
+                disabled={deletingId === note._id}
+                style={{
+                  marginTop: "0.5rem",
+                  padding: "0.4rem 0.8rem",
+                  backgroundColor: "#640259",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "0.4rem",
+                  cursor: "pointer",
+                  marginRight: "0.5rem",
+                }}
+              >
+                {deletingId === note._id ? "Deleting..." : "Delete"}
+              </button>
+              <button
+                onClick={() => startEditing(note)}
+                disabled={isLoading}
+                style={{
+                  marginTop: "0.5rem",
+                  padding: "0.4rem 0.8rem",
+                  backgroundColor: "#640259",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "0.4rem",
+                  cursor: "pointer",
+                }}
+              >
+                Edit
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div> */}
     </div>
   );
 };
 
-export default AddNote;
-
-// ✅ Tell Next.js this page should not be statically generated
-export const dynamic = "force-dynamic";
+export default AddNote; 
