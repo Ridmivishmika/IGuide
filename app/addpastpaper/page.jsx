@@ -251,3 +251,4 @@ const AddPastPaper = () => {
 };
 
 export default AddPastPaper;
+export const dynamic = "force-dynamic";

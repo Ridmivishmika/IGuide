@@ -114,3 +114,4 @@ const News = () => {
 };
 
 export default News;
+export const dynamic = "force-dynamic";

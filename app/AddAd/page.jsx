@@ -209,3 +209,4 @@ const AdManager = () => {
 };
 
 export default AdManager;
+export const dynamic = "force-dynamic";

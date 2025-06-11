@@ -167,3 +167,4 @@ const ReferenceBookPage = () => {
 };
 
 export default ReferenceBookPage;
+export const dynamic = "force-dynamic";
