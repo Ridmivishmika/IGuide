@@ -1,12 +1,10 @@
-import React from "react";
-import AddNoteForm from "@/components/AddNoteForm";
+// app/addnote/AddNoteClient.jsx
+"use client";
 
-const AddNote = async() =>{
-  return (
-    <div>
-      <AddNoteForm/>
-    </div>
-  );
-};
+import dynamic from "next/dynamic";
 
-export default AddNote; 
+const AddNoteForm = dynamic(() => import("@/components/AddNoteForm"), { ssr: false });
+
+export default function AddNoteClient() {
+  return <AddNoteForm />;
+}
