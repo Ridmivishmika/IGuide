@@ -1,28 +1,49 @@
-/* body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: #f9f9f9;
-  margin: 0;
-  padding: 0;
-}
-
-h2 {
-  text-align: center;
-  color: #640259;
-  margin-top: 2rem;
-}
-
 .container {
   display: flex;
-  gap: 2rem;
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  
-  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem 1rem;
+  background-color: #f9f9f9;
+  min-height: 100vh;
 }
 
-.form-section,
-.list-section {
+.formSection {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 100%;
+}
+
+.formSection h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #640259;
+}
+
+.formSection label {
+  display: block;
+  font-weight: bold;
+  margin-top: 1rem;
+  margin-bottom: 0.3rem;
+  color: #640259;
+}
+
+.formSection input[type="text"],
+.formSection input[type="number"],
+.formSection input[type="file"],
+.formSection select,
+.formSection textarea {
+  width: 100%;
+  padding: 0.6rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+}
+.formSection,
+.listSection {
   flex: 1;
   min-width: 350px;
   background-color: white;
@@ -31,128 +52,23 @@ h2 {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
-form {
+.formSection button[type="submit"] {
   width: 100%;
-}
-
-label {
-  display: block;
-  margin-top: 1rem;
-  font-weight: bold;
-  color: #640259;
-}
-
-input[type="text"],
-input[type="number"],
-input[type="file"],
-select {
-  width: 100%;
-  padding: 0.75rem;
-  margin-top: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  box-sizing: border-box;
-}
-
-input[type="file"] {
-  padding: 0.4rem;
-}
-
-button[type="submit"] {
-  margin-top: 1.5rem;
-  width: 100%;
-  padding: 0.75rem;
   background-color: #640259;
   color: white;
   border: none;
+  padding: 0.75rem;
   border-radius: 0.5rem;
   font-size: 1rem;
-  font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-button[type="submit"]:hover:not(:disabled) {
-  background-color: #4a0143;
-}
-
-button[type="submit"]:disabled {
-  background-color: #aa7aad;
-  cursor: not-allowed;
-}
-
-p {
   margin-top: 1rem;
-  font-size: 0.95rem;
+  transition: background-color 0.3s;
 }
 
-p[style*="color: red"] {
-  color: #640259 !important;
+.formSection button[type="submit"]:hover {
+  background-color: #4d0244;
 }
 
-p[style*="color: green"] {
-  color: #640259 !important;
-}
-
-::selection {
-  background: #640259;
-  color: white;
-}
-
-.list-section {
-  max-height: 600px;
-  overflow-y: auto;
-}
-
-.list-section h3 {
-  color: #640259;
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
-.list-section ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.list-section li {
-  background: #f6f0f9;
-  border: 1px solid #ddd;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-}
-
-.list-section li b {
-  color: #640259;
-}
-
-.list-section a {
-  color: #640259;
-  font-weight: bold;
-  text-decoration: none;
-}
-
-.list-section a:hover {
-  text-decoration: underline;
-}
-
-.list-section button {
+.formSection p {
   margin-top: 0.5rem;
-  padding: 0.4rem 0.8rem;
-  background-color: #640259;
-  color: white;
-  border: none;
-  border-radius: 0.4rem;
-  cursor: pointer;
-  margin-right: 0.5rem;
 }
-
-@media (max-width: 768px) {
-  .container {
-    flex-direction: column;
-  }
-} */

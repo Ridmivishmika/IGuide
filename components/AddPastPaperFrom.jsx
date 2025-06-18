@@ -1,10 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Input from "@/components/Input"; // Assuming you have this reusable component
+import Input from "@/components/Input";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useSession } from "next-auth/react";
-// import "./page.css";
 
 const initialState = {
   name: "",
@@ -26,18 +24,15 @@ const AddPastPaper = () => {
   const [editingId, setEditingId] = useState(null);
 
   const router = useRouter();
-  const { data: session, status } = useSession();
   const searchParams = useSearchParams();
   const editIdFromQuery = searchParams.get("editId");
 
-  // Fetch existing past papers on auth
-  useEffect(() => {
-    if (status === "authenticated") {
-      fetchPapers();
-    }
-  }, [status]);
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-  // Start editing if editId query present
+  useEffect(() => {
+    if (token) fetchPapers();
+  }, [token]);
+
   useEffect(() => {
     if (papers.length > 0 && editIdFromQuery) {
       const paperToEdit = papers.find((p) => p._id === editIdFromQuery);
@@ -49,12 +44,15 @@ const AddPastPaper = () => {
 
   const fetchPapers = async () => {
     try {
-      const res = await fetch("/api/pastpaper");
+      const res = await fetch("/api/pastpaper", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!res.ok) throw new Error("Failed to fetch past papers");
       const data = await res.json();
       setPapers(data);
     } catch (err) {
-      console.error(err);
       setError("Failed to load past papers");
     }
   };
@@ -68,7 +66,6 @@ const AddPastPaper = () => {
     }
   };
 
-  // Upload PDF to Cloudinary raw upload
   const uploadPdf = async () => {
     const formData = new FormData();
     formData.append("file", state.pdfFile);
@@ -119,42 +116,26 @@ const AddPastPaper = () => {
         pdf: pdfData ? pdfData : editingId ? undefined : null,
       };
 
-      let response;
+      const res = await fetch(editingId ? `/api/pastpaper/${editingId}` : "/api/pastpaper", {
+        method: editingId ? "PATCH" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
 
-      if (editingId) {
-        response = await fetch(`/api/pastpaper/${editingId}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session?.user?.accessToken}`,
-          },
-          body: JSON.stringify(payload),
-        });
-      } else {
-        response = await fetch("/api/pastpaper", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session?.user?.accessToken}`,
-          },
-          body: JSON.stringify(payload),
-        });
-      }
-
-      if (response.ok) {
+      if (res.ok) {
         setSuccess(editingId ? "Past paper updated successfully" : "Past paper added successfully");
         setState(initialState);
         setEditingId(null);
         fetchPapers();
-        setTimeout(() => {
-          router.refresh();
-        }, 1500);
+        setTimeout(() => router.refresh(), 1500);
       } else {
-        setError(editingId ? "Failed to update past paper" : "Failed to add past paper");
+        setError("Failed to save past paper");
       }
     } catch (err) {
       setError(err.message);
-      console.error(err);
     }
 
     setIsLoading(false);
@@ -167,7 +148,7 @@ const AddPastPaper = () => {
       year: paper.year,
       level: String(paper.level),
       language: paper.language,
-      pdfFile: paper.pdf.url, // Keep current PDF URL as string for display
+      pdfFile: paper.pdf?.url || null,
     });
     setError("");
     setSuccess("");
@@ -180,8 +161,7 @@ const AddPastPaper = () => {
     setSuccess("");
   };
 
-  if (status === "loading") return <p>Loading...</p>;
-  if (status === "unauthenticated") return <p>Access denied</p>;
+  if (!token) return <p>Access denied</p>;
 
   return (
     <div className="container">
@@ -190,7 +170,7 @@ const AddPastPaper = () => {
         <form onSubmit={handleSubmit}>
           <Input label="Name" type="text" name="name" onChange={handleChange} value={state.name} />
 
-          <label htmlFor="level">Level</label>
+          <label>Level</label>
           <select name="level" value={state.level} onChange={handleChange} required>
             <option value="">Select level</option>
             <option value="1">1</option>
@@ -200,7 +180,7 @@ const AddPastPaper = () => {
 
           <Input label="Year" type="number" name="year" onChange={handleChange} value={state.year} />
 
-          <label htmlFor="language">Language</label>
+          <label>Language</label>
           <select name="language" value={state.language} onChange={handleChange} required>
             <option value="">Select Language</option>
             <option value="Sinhala">Sinhala</option>
@@ -210,14 +190,10 @@ const AddPastPaper = () => {
 
           <label>Upload PDF {editingId ? "(leave empty to keep current)" : ""}</label>
           <input onChange={handleChange} type="file" name="pdfFile" accept=".pdf" />
-
           {state.pdfFile && typeof state.pdfFile !== "string" && <p>Selected file: {state.pdfFile.name}</p>}
           {editingId && typeof state.pdfFile === "string" && (
             <p>
-              Current PDF:{" "}
-              <a href={state.pdfFile} target="_blank" rel="noopener noreferrer">
-                View PDF
-              </a>
+              Current PDF: <a href={state.pdfFile} target="_blank">View PDF</a>
             </p>
           )}
 
@@ -228,19 +204,7 @@ const AddPastPaper = () => {
             {isLoading ? (editingId ? "Updating..." : "Uploading...") : editingId ? "Update" : "Add"}
           </button>
           {editingId && (
-            <button
-              type="button"
-              onClick={cancelEditing}
-              style={{
-                marginLeft: "1rem",
-                padding: "0.4rem 0.8rem",
-                backgroundColor: "#666",
-                color: "white",
-                border: "none",
-                borderRadius: "0.4rem",
-                cursor: "pointer",
-              }}
-            >
+            <button type="button" onClick={cancelEditing} style={{ marginLeft: "1rem" }}>
               Cancel
             </button>
           )}

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { Eye, Download, Trash2, Pencil } from "lucide-react";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import "./page.css";
 
@@ -11,13 +10,16 @@ const Pastpapers = () => {
   const [selectedLevel, setSelectedLevel] = useState(1);
   const [selectedLanguage, setSelectedLanguage] = useState("Sinhala");
 
-  const { data: session, status } = useSession();
+  const [token, setToken] = useState("");
   const router = useRouter();
 
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000";
+  const backendUrl = process.env.NEXT_PUBLIC_URL; // Ensure this is defined in your .env file
 
   useEffect(() => {
-    const fetchPastpapers = async () => {
+    const fetchTokenAndData = async () => {
+      const storedToken = localStorage.getItem("accessToken");
+      setToken(storedToken || "");
+
       try {
         const res = await fetch(`${backendUrl}/api/pastpaper`, {
           cache: "no-store",
@@ -29,7 +31,8 @@ const Pastpapers = () => {
         console.error("Error fetching past papers:", error);
       }
     };
-    fetchPastpapers();
+
+    fetchTokenAndData();
   }, [backendUrl]);
 
   const deletePaper = async (id) => {
@@ -41,7 +44,7 @@ const Pastpapers = () => {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.user?.accessToken}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -131,7 +134,7 @@ const Pastpapers = () => {
                     <Download color="#640259" size={18} style={{ marginRight: "0.5rem" }} />
                   </a>
 
-                  {status === "authenticated" && (
+                  {token && (
                     <>
                       <button
                         className="btn delete"

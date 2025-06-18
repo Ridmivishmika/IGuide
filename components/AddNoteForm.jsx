@@ -3,8 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Input from "@/components/Input";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useSession } from "next-auth/react";
-// import ".";
+import "./AddNoteForm.module.css";
 
 const initialState = {
   name: "",
@@ -16,7 +15,7 @@ const initialState = {
 
 const AddNoteForm = () => {
   const CLOUDINARY_CLOUD_NAME = "dwq5xfmci";
-  const UPLOAD_PRESET = "iguide_past_papers"; // change preset for notes if needed
+  const UPLOAD_PRESET = "iguide_past_papers";
 
   const [state, setState] = useState(initialState);
   const [notes, setNotes] = useState([]);
@@ -25,20 +24,19 @@ const AddNoteForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  const [token, setToken] = useState("");
 
   const router = useRouter();
-  const { data: session, status } = useSession();
   const searchParams = useSearchParams();
   const editIdFromQuery = searchParams.get("editId");
 
-  // Fetch notes when authenticated
   useEffect(() => {
-    if (status === "authenticated") {
-      fetchNotes();
-    }
-  }, [status]);
+    const storedToken = localStorage.getItem("token");
+    if (!storedToken) return;
+    setToken(storedToken);
+    fetchNotes(storedToken);
+  }, []);
 
-  // After notes are fetched, if editIdFromQuery exists, start editing that note
   useEffect(() => {
     if (notes.length > 0 && editIdFromQuery) {
       const noteToEdit = notes.find((note) => note._id === editIdFromQuery);
@@ -48,9 +46,13 @@ const AddNoteForm = () => {
     }
   }, [notes, editIdFromQuery]);
 
-  const fetchNotes = async () => {
+  const fetchNotes = async (authToken) => {
     try {
-      const res = await fetch("/api/note");
+      const res = await fetch("/api/note", {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
       if (!res.ok) throw new Error("Failed to fetch notes");
       const data = await res.json();
       setNotes(data);
@@ -83,7 +85,6 @@ const AddNoteForm = () => {
     );
 
     if (!res.ok) throw new Error("Failed to upload note");
-
     const data = await res.json();
     return { id: data.public_id, url: data.secure_url };
   };
@@ -96,7 +97,6 @@ const AddNoteForm = () => {
       return;
     }
 
-    // For new note, file is required; for editing, optional
     if (!editingId && !state.noteFile) {
       setError("Note file is required for new notes.");
       return;
@@ -121,23 +121,21 @@ const AddNoteForm = () => {
       };
 
       let response;
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
 
       if (editingId) {
-        response = await fetch("/api/note/${editingId}", {
+        response = await fetch(`/api/note/${editingId}`, {
           method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session?.user?.accessToken}`,
-          },
+          headers,
           body: JSON.stringify(payload),
         });
       } else {
         response = await fetch("/api/note", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization:`Bearer ${session?.user?.accessToken}`,
-          },
+          headers,
           body: JSON.stringify(payload),
         });
       }
@@ -146,7 +144,7 @@ const AddNoteForm = () => {
         setSuccess(editingId ? "Note updated successfully" : "Note added successfully");
         setState(initialState);
         setEditingId(null);
-        fetchNotes();
+        fetchNotes(token);
         setTimeout(() => {
           router.refresh();
         }, 1500);
@@ -161,33 +159,6 @@ const AddNoteForm = () => {
     setIsLoading(false);
   };
 
-  // const handleDelete = async (id) => {
-  //   setDeletingId(id);
-  //   setError("");
-  //   setSuccess("");
-
-  //   try {
-  //     const res = await fetch(/api/note/${id}, {
-  //       method: "DELETE",
-  //       headers: {
-  //         Authorization: Bearer ${session?.user?.accessToken},
-  //       },
-  //     });
-
-  //     if (res.ok) {
-  //       setSuccess("Note deleted successfully");
-  //       fetchNotes();
-  //     } else {
-  //       setError("Failed to delete note");
-  //     }
-  //   } catch (err) {
-  //     setError("An error occurred while deleting");
-  //     console.error(err);
-  //   }
-
-  //   setDeletingId(null);
-  // };
-
   const startEditing = (note) => {
     setEditingId(note._id);
     setState({
@@ -195,7 +166,7 @@ const AddNoteForm = () => {
       year: note.year,
       level: String(note.level),
       language: note.language,
-      noteFile: note.note.url, // Keep current note URL as string (not a File)
+      noteFile: note.note.url,
     });
     setError("");
     setSuccess("");
@@ -207,9 +178,6 @@ const AddNoteForm = () => {
     setError("");
     setSuccess("");
   };
-
-  if (status === "loading") return <p>Loading...</p>;
-  if (status === "unauthenticated") return <p>Access denied</p>;
 
   return (
     <div className="container">
@@ -274,59 +242,8 @@ const AddNoteForm = () => {
           )}
         </form>
       </div>
-
-      {/* <div className="list-section">
-        <h3>Existing Notes</h3>
-        <ul>
-          {notes.map((note) => (
-            <li key={note._id}>
-              <b>{note.name}</b> ({note.year})
-              <br />
-              Level: {note.level}
-              <br />
-              Language: {note.language}
-              <br />
-              <a href={note.note.url} target="_blank" rel="noopener noreferrer">
-                View Note
-              </a>
-              <br />
-              <button
-                onClick={() => handleDelete(note._id)}
-                disabled={deletingId === note._id}
-                style={{
-                  marginTop: "0.5rem",
-                  padding: "0.4rem 0.8rem",
-                  backgroundColor: "#640259",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "0.4rem",
-                  cursor: "pointer",
-                  marginRight: "0.5rem",
-                }}
-              >
-                {deletingId === note._id ? "Deleting..." : "Delete"}
-              </button>
-              <button
-                onClick={() => startEditing(note)}
-                disabled={isLoading}
-                style={{
-                  marginTop: "0.5rem",
-                  padding: "0.4rem 0.8rem",
-                  backgroundColor: "#640259",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "0.4rem",
-                  cursor: "pointer",
-                }}
-              >
-                Edit
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div> */}
     </div>
   );
 };
 
-export default AddNoteForm; 
+export default AddNoteForm;

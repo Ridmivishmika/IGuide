@@ -2,20 +2,20 @@
 
 import React, { useState, useEffect } from "react";
 import { Eye, Download, Trash2, Pencil } from "lucide-react";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import "./page.css";
 
 const ReferenceBooks = () => {
   const [referenceBooks, setReferenceBooks] = useState([]);
   const [selectedLevel, setSelectedLevel] = useState(1);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const { data: session, status } = useSession();
   const router = useRouter();
-
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000';
+  const backendUrl = process.env.NEXT_PUBLIC_URL;
 
   useEffect(() => {
+    const token = localStorage.getItem("accessToken"); // ✅ FIXED
+    setIsLoggedIn(!!token);
     fetchReferenceBooks();
   }, []);
 
@@ -36,12 +36,18 @@ const ReferenceBooks = () => {
     const confirmDelete = confirm("Are you sure you want to delete this reference book?");
     if (!confirmDelete) return;
 
+    const token = localStorage.getItem("accessToken"); // ✅ FIXED
+    if (!token) {
+      alert("Not authorized");
+      return;
+    }
+
     try {
       const res = await fetch(`${backendUrl}/api/referencebook/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.user?.accessToken}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -114,7 +120,7 @@ const ReferenceBooks = () => {
                     <Download size={18} />
                   </a>
 
-                  {status === "authenticated" && (
+                  {isLoggedIn && (
                     <>
                       <button
                         className="btn delete"

@@ -1,212 +1,106 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
-import Input from "@/components/Input";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+import './page.css'
 
-const initialState = {
-  name: "",
-  photo: null,
-  _id: null,
-};
-
-const CLOUDINARY_CLOUD_NAME = "dwq5xfmci";
-const UPLOAD_PRESET = "iguide_past_papers";
-
-const AdManager = () => {
-  const [state, setState] = useState(initialState);
-  const [ads, setAds] = useState([]);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const { data: session, status } = useSession();
+const AddAds = () => {
+  const [formData, setFormData] = useState({ name: "", image: null });
+  const [previewImage, setPreviewImage] = useState(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [editId, setEditId] = useState(null);
   const router = useRouter();
 
+  const backendUrl = process.env.NEXT_PUBLIC_URL; // Update .env if needed
+
   useEffect(() => {
-    fetchAds();
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get("editId");
+    setEditId(id);
+
+    const fetchAdDetails = async () => {
+      if (id) {
+        try {
+          const res = await fetch(`${backendUrl}/api/ads/${id}`);
+          if (!res.ok) throw new Error("Failed to fetch ad details");
+          const data = await res.json();
+          setFormData({ name: data.name || "", image: null });
+          setPreviewImage(data.image?.url || null);
+          setIsUpdating(true);
+        } catch (error) {
+          console.error("Error loading ad:", error);
+        }
+      }
+    };
+
+    fetchAdDetails();
   }, []);
 
-  const fetchAds = async () => {
-    try {
-      const res = await fetch("/api/ads");
-      const data = await res.json();
-      setAds(data);
-    } catch (err) {
-      setError("Failed to fetch ads.");
-    }
-  };
-
   const handleChange = (e) => {
-    const { name, value, type, files } = e.target;
-    setError("");
-    if (type === "file") {
-      setState((prev) => ({ ...prev, [name]: files[0] }));
+    if (e.target.name === "image") {
+      const file = e.target.files[0];
+      setFormData({ ...formData, image: file });
+      setPreviewImage(URL.createObjectURL(file));
     } else {
-      setState((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const uploadImage = async () => {
-    if (!state.photo || typeof state.photo === "string") return null;
-    const formData = new FormData();
-    formData.append("file", state.photo);
-    formData.append("upload_preset", UPLOAD_PRESET);
-    try {
-      const res = await fetch(
-        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/raw/upload`,
-        { method: "POST", body: formData }
-      );
-      const data = await res.json();
-      return { id: data.public_id, url: data.secure_url };
-    } catch (err) {
-      console.error("Upload error:", err);
-      return null;
+      setFormData({ ...formData, [e.target.name]: e.target.value });
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
-
-    if (!state.name || !state.photo) {
-      setError("Please fill out all fields.");
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Unauthorized: Please log in.");
       return;
     }
 
-    if (state.photo.size > 5 * 1024 * 1024) {
-      setError("Max file size is 5MB.");
-      return;
-    }
+    const form = new FormData();
+    form.append("name", formData.name);
+    if (formData.image) form.append("image", formData.image);
 
-    setIsLoading(true);
     try {
-      const image = await uploadImage();
-      if (!image && !state._id) {
-        setError("Failed to upload image.");
-        return;
-      }
-
-      const adData = {
-        name: state.name,
-        image: image || (typeof state.photo === "string" ? { url: state.photo } : null),
-      };
-
-      const response = await fetch(
-        state._id ? `/api/ads/${state._id}` : "/api/ads",
-        {
-          method: state._id ? "PUT" : "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session?.user?.accessToken}`,
-          },
-          body: JSON.stringify(adData),
-        }
-      );
-
-      if (response.ok) {
-        setSuccess(state._id ? "Ad updated." : "Ad created.");
-        setState(initialState);
-        fetchAds();
-      } else {
-        setError("Submission failed.");
-      }
-    } catch (err) {
-      setError("An unexpected error occurred.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    const confirmed = confirm("Delete this ad?");
-    if (!confirmed) return;
-    try {
-      const res = await fetch(`/api/ads/${id}`, {
-        method: "DELETE",
+      const res = await fetch(`${backendUrl}/api/ads${isUpdating ? `/${editId}` : ""}`, {
+        method: isUpdating ? "PUT" : "POST",
         headers: {
-          Authorization: `Bearer ${session?.user?.accessToken}`,
+          Authorization: `Bearer ${token}`,
         },
+        body: form,
       });
-      if (res.ok) {
-        setAds((prev) => prev.filter((ad) => ad._id !== id));
-      } else {
-        setError("Failed to delete.");
-      }
+
+      if (!res.ok) throw new Error("Failed to submit ad");
+      router.push("/ad");
     } catch (err) {
-      setError("Delete error.");
+      console.error("Submission error:", err);
     }
   };
-
-  const handleEdit = (ad) => {
-    setState({
-      name: ad.name,
-      photo: ad.image?.url || null,
-      _id: ad._id,
-    });
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  if (status === "loading") return <p>Loading session...</p>;
-  if (status === "unauthenticated") return <p>Access denied</p>;
 
   return (
-    <section className="container max-w-4xl">
-      <h2>{state._id ? "Update" : "Create"} <span className="special-word">Ad</span></h2>
-      <form onSubmit={handleSubmit}>
-        <Input
-          label="Name"
+    <div className="form-container">
+      <h1>{isUpdating ? "Update Ad" : "Add Ad"}</h1>
+      <form onSubmit={handleSubmit} encType="multipart/form-data">
+        <input
           type="text"
           name="name"
-          placeholder="Enter ad title..."
-          value={state.name}
+          placeholder="Ad Name"
+          value={formData.name}
           onChange={handleChange}
+          required
         />
 
-        <label htmlFor="photo">Upload Image</label>
-        <input type="file" name="photo" accept="image/*" onChange={handleChange} />
-        {state.photo && typeof state.photo !== "string" && (
-          <img src={URL.createObjectURL(state.photo)} alt="Preview" />
-        )}
-        {typeof state.photo === "string" && (
-          <img src={state.photo} alt="Existing" />
+        <input type="file" name="image" accept="image/*" onChange={handleChange} />
+
+        {previewImage && (
+          <img
+            src={previewImage}
+            alt="Preview"
+            style={{ marginTop: "1rem", maxWidth: "100%", borderRadius: "8px" }}
+          />
         )}
 
-        {error && <p className="text-red-600">{error}</p>}
-        {success && <p className="text-green-600">{success}</p>}
-
-        <button type="submit" className="btn">
-          {isLoading ? "Submitting..." : state._id ? "Update Ad" : "Create Ad"}
-        </button>
+        <button type="submit">{isUpdating ? "Update" : "Add"}</button>
       </form>
-
-      <hr style={{ margin: "2rem 0" }} />
-
-      <h2>Existing <span className="special-word">Ads</span></h2>
-      {ads.length === 0 ? (
-        <p>No ads found.</p>
-      ) : (
-        <div className="ad-list">
-          {ads.map((ad) => (
-            <div className="ad-card" key={ad._id}>
-              <img src={ad.image?.url || "/no-img.png"} alt={ad.name} />
-              <div className="ad-details">
-                <p className="font-semibold">{ad.name}</p>
-                <p className="text-sm">{ad.image?.url}</p>
-              </div>
-              <div className="ad-actions">
-                <button onClick={() => handleEdit(ad)} className="btn">Edit</button>
-                <button onClick={() => handleDelete(ad._id)} className="btn" style={{ backgroundColor: "#d11a2a" }}>Delete</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </section>
+    </div>
   );
 };
 
-export default AdManager;
-export const dynamic = "force-dynamic";
+export default AddAds;

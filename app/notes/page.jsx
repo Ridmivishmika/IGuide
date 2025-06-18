@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { Eye, Download, Trash2, Pencil } from "lucide-react";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import "./page.css";
 
@@ -11,12 +10,15 @@ const Notes = () => {
   const [selectedLevel, setSelectedLevel] = useState(1);
   const [selectedLanguage, setSelectedLanguage] = useState("Sinhala");
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: session, status } = useSession();
+  const [token, setToken] = useState("");
   const router = useRouter();
 
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000';
+  const backendUrl = process.env.NEXT_PUBLIC_URL; // Ensure this is defined in .env
 
   useEffect(() => {
+    const storedToken = localStorage.getItem("accessToken");
+    setToken(storedToken || "");
+
     fetchNotes();
   }, []);
 
@@ -40,7 +42,7 @@ const Notes = () => {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.user?.accessToken}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -53,7 +55,7 @@ const Notes = () => {
   };
 
   const editNote = (id) => {
-router.push(`/addnote?editId=${id}`);
+    router.push(`/addnote?editId=${id}`);
   };
 
   const filteredNotes = notes.filter(
@@ -147,7 +149,7 @@ router.push(`/addnote?editId=${id}`);
                     <Download size={18} />
                   </a>
 
-                  {status === "authenticated" && (
+                  {token && (
                     <>
                       <button
                         className="btn delete"

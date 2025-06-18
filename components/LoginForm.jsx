@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import styles from "./LoginForm.module.css";
 
-
 const initialState = {
   email: "",
   password: ""
@@ -25,9 +24,7 @@ const LoginForm = () => {
     setHydrated(true);
   }, []);
 
-  if (!hydrated) {
-    return null;
-  }
+  if (!hydrated) return null;
 
   const handleChange = (event) => {
     setError("");
@@ -36,7 +33,6 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const { email, password } = state;
 
     if (!email || !password) {
@@ -45,7 +41,6 @@ const LoginForm = () => {
     }
 
     const pattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-
     if (!pattern.test(email)) {
       setError("Enter a valid email");
       return;
@@ -53,7 +48,6 @@ const LoginForm = () => {
 
     try {
       setIsLoading(true);
-
       const res = await signIn("credentials", {
         email,
         password,
@@ -66,49 +60,53 @@ const LoginForm = () => {
         return;
       }
 
+      // ✅ Store token (simulate real JWT login here)
+      localStorage.setItem("accessToken", "example_token_123");
+
+      // ✅ Notify Navbar to refresh
+      window.dispatchEvent(new Event("storage"));
+
+      // ✅ Redirect to protected route
       router.push("/addnote");
     } catch (error) {
       console.error(error);
       setError("Something went wrong");
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
-  <div className={styles['note-page-container']}>
-  <h2>Login</h2>
-  <section>
-    <form onSubmit={handleSubmit}>
-      <Input
-        label="Email"
-        type="text"
-        name="email"
-        onChange={handleChange}
-        value={state.email}
-      />
-      <Input
-        label="Password"
-        type="password"
-        name="password"
-        onChange={handleChange}
-        value={state.password}
-      />
+    <div className={styles['note-page-container']}>
+      <h2>Login</h2>
+      <section>
+        <form onSubmit={handleSubmit}>
+          <Input
+            label="Email"
+            type="text"
+            name="email"
+            onChange={handleChange}
+            value={state.email}
+          />
+          <Input
+            label="Password"
+            type="password"
+            name="password"
+            onChange={handleChange}
+            value={state.password}
+          />
 
-      {error && <p className={styles['error-message']}>{error}</p>}
-      {success && <p className={styles['success-message']}>{success}</p>}
+          {error && <p className={styles['error-message']}>{error}</p>}
+          {success && <p className={styles['success-message']}>{success}</p>}
 
-      <button type="submit">{isLoading ? "Loading" : "Login"}</button>
-      <p>
-        Haven't Account?
-        <Link href="/signup" className={styles.link}>
-          Signup
-        </Link>
-      </p>
-    </form>
-  </section>
-</div>
-
+          <button type="submit">{isLoading ? "Loading..." : "Login"}</button>
+          <p>
+            Haven't Account?
+            <Link href="/signup" className={styles.link}>Signup</Link>
+          </p>
+        </form>
+      </section>
+    </div>
   );
 };
 

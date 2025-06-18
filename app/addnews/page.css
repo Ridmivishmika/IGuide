@@ -1,51 +1,62 @@
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: #f4f4f4;
+  background: #f9f9f9;
   margin: 0;
   padding: 0;
 }
 
-h2 {
+/* Heading Style */
+h1 {
   text-align: center;
   color: #640259;
   margin-top: 2rem;
 }
 
-form {
+/* Form Container */
+.form-container {
   max-width: 500px;
   margin: 2rem auto;
   padding: 2rem;
   background-color: white;
   border-radius: 1rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
-input[type="number"],
+/* Input + Textarea Styles */
 input[type="text"],
 textarea {
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.8rem;
   margin-top: 1rem;
-  border: 1px solid #ddd;
+  border: 1px solid #ccc;
   border-radius: 0.5rem;
   font-size: 1rem;
-  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+input[type="text"]:focus,
+textarea:focus {
+  outline: none;
+  border-color: #640259;
 }
 
 textarea {
   min-height: 120px;
+  resize: vertical;
 }
 
+/* Submit Button */
 button[type="submit"] {
-  margin-top: 1.5rem;
   width: 100%;
+  margin-top: 1.5rem;
   padding: 0.75rem;
   background-color: #640259;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
+  color: #fff;
   font-size: 1rem;
   font-weight: bold;
+  border: none;
+  border-radius: 0.5rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
@@ -54,47 +65,8 @@ button[type="submit"]:hover {
   background-color: #4a0143;
 }
 
+/* Selection Highlight */
 ::selection {
-  background: #C43EC3;
+  background: #c43ec3;
   color: white;
-}
-
-.news-container {
-  padding-bottom: 4rem;
-}
-
-.news-list {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 1rem;
-}
-
-.news-card {
-  background-color: white;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-  border-left: 6px solid #640259;
-  border-radius: 0.75rem;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
-}
-
-.news-card h3 {
-  margin-top: 0;
-  color: #640259;
-}
-
-.news-card p {
-  margin: 0.5rem 0;
-  color: #333;
-}
-
-.news-id {
-  font-size: 0.9rem;
-  color: #888;
-}
-
-.no-news {
-  text-align: center;
-  color: #999;
-  font-style: italic;
 }

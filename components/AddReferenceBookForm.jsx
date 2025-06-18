@@ -3,8 +3,6 @@
 import React, { useEffect, useState } from "react";
 import Input from "@/components/Input";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useSession } from "next-auth/react";
-// import "./page.css";
 
 const initialState = {
   name: "",
@@ -27,8 +25,7 @@ const ReferenceBookPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editIdFromParams = searchParams.get("editId");
-
-  const { data: session, status } = useSession();
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   useEffect(() => {
     if (editIdFromParams) {
@@ -52,7 +49,7 @@ const ReferenceBookPage = () => {
         name: data.name,
         level: data.level,
         description: data.description,
-        referenceBook: null, // PDF won't be refilled
+        referenceBook: null,
       });
     } catch (error) {
       setError("Failed to load reference book data for editing.");
@@ -111,14 +108,11 @@ const ReferenceBookPage = () => {
 
       if (uploaded) payload.referenceBook = uploaded;
 
-      const method = editingId ? "PATCH" : "POST";
-      const url = editingId ? `/api/referencebook/${editingId}` : "/api/referencebook";
-
-      const res = await fetch(url, {
-        method,
+      const res = await fetch(editingId ? `/api/referencebook/${editingId}` : "/api/referencebook", {
+        method: editingId ? "PATCH" : "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.user?.accessToken}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });
@@ -139,16 +133,13 @@ const ReferenceBookPage = () => {
     setIsLoading(false);
   };
 
-  if (status === "loading") return <p>Loading...</p>;
-  if (status === "unauthenticated") return <p>Access denied</p>;
+  if (!token) return <p>Access denied</p>;
 
   return (
     <div className="referencebook-page">
       <div className="referencebook-form-card">
-        <h2 className="section-title">
-          {editingId ? "Update Reference Book" : "Add Reference Book"}
-        </h2>
-        <form onSubmit={handleSubmit} className="form-container">
+        <h2>{editingId ? "Update Reference Book" : "Add Reference Book"}</h2>
+        <form onSubmit={handleSubmit}>
           <Input label="Name" type="text" name="name" onChange={handleChange} value={state.name} />
           <Input label="Level" type="number" name="level" onChange={handleChange} value={state.level} />
           <Input label="Description" type="text" name="description" onChange={handleChange} value={state.description} />

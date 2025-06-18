@@ -2,47 +2,99 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { Pencil, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import "./page.css";
 
 const News = () => {
   const [newsList, setNewsList] = useState([]);
   const [adsList, setAdsList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const backendUrl =
-  process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000';
+  const [token, setToken] = useState("");
+  const router = useRouter();
 
-
+  const backendUrl = process.env.NEXT_PUBLIC_URL; // Make sure this is defined in .env
 
   useEffect(() => {
-    const fetchNews = async () => {
-      try {
-        const res = await fetch(`${backendUrl}/api/news`, {
-          cache: "no-store",
-        });
-        if (!res.ok) throw new Error("Failed to fetch news");
-        const data = await res.json();
-        setNewsList(data);
-      } catch (error) {
-        console.error("Error fetching news:", error);
-      }
-    };
-
-    const fetchAds = async () => {
-      try {
-        const res = await fetch(`${backendUrl}/api/ads`, {
-          cache: "no-store",
-        });
-        if (!res.ok) throw new Error("Failed to fetch ads");
-        const data = await res.json();
-        setAdsList(data);
-      } catch (error) {
-        console.error("Error fetching ads:", error);
-      }
-    };
+    // Get token from localStorage once on mount
+    const storedToken = localStorage.getItem("accessToken");
+    setToken(storedToken || "");
 
     fetchNews();
     fetchAds();
   }, []);
+
+  const fetchNews = async () => {
+    try {
+      const res = await fetch(`${backendUrl}/api/news`, { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to fetch news");
+      const data = await res.json();
+      setNewsList(data);
+    } catch (error) {
+      console.error("Error fetching news:", error);
+    }
+  };
+
+  const fetchAds = async () => {
+    try {
+      const res = await fetch(`${backendUrl}/api/ads`, { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to fetch ads");
+      const data = await res.json();
+      setAdsList(data);
+    } catch (error) {
+      console.error("Error fetching ads:", error);
+    }
+  };
+
+  const handleDeleteNews = async (id) => {
+    const confirmDelete = confirm("Are you sure you want to delete this news?");
+    if (!confirmDelete) return;
+
+    try {
+      const res = await fetch(`${backendUrl}/api/news/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to delete news");
+
+      setNewsList((prev) => prev.filter((item) => item._id !== id));
+    } catch (error) {
+      console.error("Delete error:", error);
+    }
+  };
+
+  const handleDeleteAd = async (id) => {
+    const confirmDelete = confirm("Are you sure you want to delete this ad?");
+    if (!confirmDelete) return;
+
+    try {
+      const res = await fetch(`${backendUrl}/api/ads/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to delete ad");
+
+      setAdsList((prev) => prev.filter((item) => item._id !== id));
+    } catch (error) {
+      console.error("Delete ad error:", error);
+    }
+  };
+
+  const handleEditNews = (id) => {
+    router.push(`/addnews?editId=${id}`);
+  };
+
+  const handleEditAd = (id) => {
+    router.push(`/addad?editId=${id}`);
+  };
 
   const filteredNews = newsList.filter(
     (news) =>
@@ -52,28 +104,43 @@ const News = () => {
 
   return (
     <div className="news-page">
-      {/* Main news content */}
-      <main className="news-main">
-        {/* <div className="news-search">
-          <input
-            type="text"
-            placeholder="Search news..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div> */}
+      <div className="search-bar">
+        <input
+          type="text"
+          placeholder="Search news..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
 
+      {/* News Section */}
+      <main className="news-main">
+        <h2>News</h2>
         <div className="news-grid">
           {filteredNews.length > 0 ? (
             filteredNews.map((news) => (
               <div key={news._id} className="news-card">
-                <h2>{news.name}</h2>
-                <p>
-                  <strong>Description:</strong> {news.description}
-                </p>
-                {/* <p>
-                  <strong>Date:</strong> {news.date || "N/A"}
-                </p> */}
+                <h3>{news.name}</h3>
+                <p>{news.description}</p>
+
+                {token && (
+                  <div className="news-actions">
+                    <button
+                      className="edit-btn"
+                      onClick={() => handleEditNews(news._id)}
+                      title="Edit"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      className="delete-btn"
+                      onClick={() => handleDeleteNews(news._id)}
+                      title="Delete"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                )}
               </div>
             ))
           ) : (
@@ -82,7 +149,7 @@ const News = () => {
         </div>
       </main>
 
-      {/* Sidebar with Ads */}
+      {/* Ads Section */}
       <aside className="news-ads">
         <h3>Sponsored Ads</h3>
         {adsList.length > 0 ? (
@@ -99,6 +166,26 @@ const News = () => {
                 />
               ) : (
                 <p className="no-data">No image available</p>
+              )}
+
+              {token && (
+                <div className="news-actions">
+                  {/* Uncomment if edit ad button is needed */}
+                  {/* <button
+                    className="edit-btn"
+                    onClick={() => handleEditAd(ad._id)}
+                    title="Edit Ad"
+                  >
+                    <Pencil size={16} />
+                  </button> */}
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDeleteAd(ad._id)}
+                    title="Delete Ad"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               )}
             </div>
           ))
