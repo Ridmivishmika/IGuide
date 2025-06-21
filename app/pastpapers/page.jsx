@@ -9,43 +9,31 @@ const Pastpapers = () => {
   const [pastpapers, setPastpapers] = useState([]);
   const [selectedLevel, setSelectedLevel] = useState(1);
   const [selectedLanguage, setSelectedLanguage] = useState("Sinhala");
-
-  const [token, setToken] = useState("");
   const router = useRouter();
 
-  const backendUrl = process.env.NEXT_PUBLIC_URL; // Ensure this is defined in your .env file
+  const backendUrl = process.env.NEXT_PUBLIC_URL;
 
   useEffect(() => {
-    const fetchTokenAndData = async () => {
-      const storedToken = localStorage.getItem("accessToken");
-      setToken(storedToken || "");
+    fetchPastpapers();
+  }, []);
 
-      try {
-        const res = await fetch(`${backendUrl}/api/pastpaper`, {
-          cache: "no-store",
-        });
-        if (!res.ok) throw new Error("Failed to fetch data");
-        const data = await res.json();
-        setPastpapers(data);
-      } catch (error) {
-        console.error("Error fetching past papers:", error);
-      }
-    };
-
-    fetchTokenAndData();
-  }, [backendUrl]);
+  const fetchPastpapers = async () => {
+    try {
+      const res = await fetch(`${backendUrl}/api/pastpaper`, { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to fetch data");
+      const data = await res.json();
+      setPastpapers(data);
+    } catch (error) {
+      console.error("Error fetching past papers:", error);
+    }
+  };
 
   const deletePaper = async (id) => {
-    const confirmDelete = confirm("Are you sure you want to delete this paper?");
-    if (!confirmDelete) return;
+    if (!confirm("Are you sure you want to delete this paper?")) return;
 
     try {
       const res = await fetch(`${backendUrl}/api/pastpaper/${id}`, {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
       });
 
       if (!res.ok) throw new Error("Delete failed");
@@ -86,7 +74,9 @@ const Pastpapers = () => {
                 {["Sinhala", "English", "Tamil"].map((language) => (
                   <div
                     key={language}
-                    className={`sidebar-subitem ${selectedLanguage === language ? "active" : ""}`}
+                    className={`sidebar-subitem ${
+                      selectedLanguage === language ? "active" : ""
+                    }`}
                     onClick={() => setSelectedLanguage(language)}
                   >
                     {language}
@@ -134,25 +124,21 @@ const Pastpapers = () => {
                     <Download color="#640259" size={18} style={{ marginRight: "0.5rem" }} />
                   </a>
 
-                  {token && (
-                    <>
-                      <button
-                        className="btn delete"
-                        onClick={() => deletePaper(paper._id)}
-                        title="Delete Paper"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+                  <button
+                    className="btn delete"
+                    onClick={() => deletePaper(paper._id)}
+                    title="Delete Paper"
+                  >
+                    <Trash2 size={18} />
+                  </button>
 
-                      <button
-                        className="btn edit"
-                        onClick={() => editPaper(paper._id)}
-                        title="Edit Paper"
-                      >
-                        <Pencil size={18} />
-                      </button>
-                    </>
-                  )}
+                  <button
+                    className="btn edit"
+                    onClick={() => editPaper(paper._id)}
+                    title="Edit Paper"
+                  >
+                    <Pencil size={18} />
+                  </button>
                 </div>
               </div>
             ))

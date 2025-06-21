@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Input from "@/components/Input";
 import { useRouter, useSearchParams } from "next/navigation";
+import styles from './AddPastPaperForm.module.css';
 
 const initialState = {
   name: "",
@@ -27,11 +28,12 @@ const AddPastPaper = () => {
   const searchParams = useSearchParams();
   const editIdFromQuery = searchParams.get("editId");
 
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  // Removed token
+  // const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   useEffect(() => {
-    if (token) fetchPapers();
-  }, [token]);
+    fetchPapers();
+  }, []);
 
   useEffect(() => {
     if (papers.length > 0 && editIdFromQuery) {
@@ -44,11 +46,7 @@ const AddPastPaper = () => {
 
   const fetchPapers = async () => {
     try {
-      const res = await fetch("/api/pastpaper", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch("/api/pastpaper");
       if (!res.ok) throw new Error("Failed to fetch past papers");
       const data = await res.json();
       setPapers(data);
@@ -120,7 +118,7 @@ const AddPastPaper = () => {
         method: editingId ? "PATCH" : "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          // Removed Authorization header
         },
         body: JSON.stringify(payload),
       });
@@ -161,57 +159,97 @@ const AddPastPaper = () => {
     setSuccess("");
   };
 
-  if (!token) return <p>Access denied</p>;
+  // Removed access denied check, so always show form
 
-  return (
-    <div className="container">
-      <div className="form-section">
-        <h2>{editingId ? "Update Past Paper" : "Add Past Paper"}</h2>
-        <form onSubmit={handleSubmit}>
-          <Input label="Name" type="text" name="name" onChange={handleChange} value={state.name} />
+return (
+  <div className={styles.container}>
+    <div className={styles.formSection}>
+      <h2 className={styles.heading}>{editingId ? "Update Past Paper" : "Add Past Paper"}</h2>
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <Input
+          label="Name"
+          type="text"
+          name="name"
+          onChange={handleChange}
+          value={state.name}
+          className={styles.input}
+        />
 
-          <label>Level</label>
-          <select name="level" value={state.level} onChange={handleChange} required>
-            <option value="">Select level</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-          </select>
+        <label htmlFor="level" className={styles.label}>Level</label>
+        <select
+          name="level"
+          value={state.level}
+          onChange={handleChange}
+          required
+          className={styles.select}
+        >
+          <option value="">Select level</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+        </select>
 
-          <Input label="Year" type="number" name="year" onChange={handleChange} value={state.year} />
+        <Input
+          label="Year"
+          type="number"
+          name="year"
+          onChange={handleChange}
+          value={state.year}
+          className={styles.input}
+        />
 
-          <label>Language</label>
-          <select name="language" value={state.language} onChange={handleChange} required>
-            <option value="">Select Language</option>
-            <option value="Sinhala">Sinhala</option>
-            <option value="English">English</option>
-            <option value="Tamil">Tamil</option>
-          </select>
+        <label htmlFor="language" className={styles.label}>Language</label>
+        <select
+          name="language"
+          value={state.language}
+          onChange={handleChange}
+          required
+          className={styles.select}
+        >
+          <option value="">Select Language</option>
+          <option value="Sinhala">Sinhala</option>
+          <option value="English">English</option>
+          <option value="Tamil">Tamil</option>
+        </select>
 
-          <label>Upload PDF {editingId ? "(leave empty to keep current)" : ""}</label>
-          <input onChange={handleChange} type="file" name="pdfFile" accept=".pdf" />
-          {state.pdfFile && typeof state.pdfFile !== "string" && <p>Selected file: {state.pdfFile.name}</p>}
-          {editingId && typeof state.pdfFile === "string" && (
-            <p>
-              Current PDF: <a href={state.pdfFile} target="_blank">View PDF</a>
-            </p>
-          )}
+        <label className={styles.label}>
+          Upload PDF {editingId ? "(leave empty to keep current)" : ""}
+        </label>
+        <input
+          onChange={handleChange}
+          type="file"
+          name="pdfFile"
+          accept=".pdf"
+          className={styles.fileInput}
+        />
 
-          {error && <p style={{ color: "red" }}>{error}</p>}
-          {success && <p style={{ color: "green" }}>{success}</p>}
+        {state.pdfFile && typeof state.pdfFile !== "string" && (
+          <p className={styles.message}>Selected file: {state.pdfFile.name}</p>
+        )}
+        {editingId && typeof state.pdfFile === "string" && (
+          <p className={styles.message}>
+            Current PDF: <a href={state.pdfFile} target="_blank" rel="noopener noreferrer">View PDF</a>
+          </p>
+        )}
 
-          <button type="submit" disabled={isLoading}>
-            {isLoading ? (editingId ? "Updating..." : "Uploading...") : editingId ? "Update" : "Add"}
+        {error && <p className={`${styles.message} ${styles.error}`}>{error}</p>}
+        {success && <p className={`${styles.message} ${styles.success}`}>{success}</p>}
+
+        <button type="submit" disabled={isLoading} className={styles.button}>
+          {isLoading ? (editingId ? "Updating..." : "Uploading...") : editingId ? "Update" : "Add"}
+        </button>
+
+        {editingId && (
+          <button type="button" onClick={cancelEditing} className={styles.cancelButton}>
+            Cancel
           </button>
-          {editingId && (
-            <button type="button" onClick={cancelEditing} style={{ marginLeft: "1rem" }}>
-              Cancel
-            </button>
-          )}
-        </form>
-      </div>
+        )}
+      </form>
     </div>
-  );
+  </div>
+);
+
+
 };
 
 export default AddPastPaper;

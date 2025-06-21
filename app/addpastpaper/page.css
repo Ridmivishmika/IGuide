@@ -1,4 +1,4 @@
-body {
+/* body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background: #f9f9f9;
   margin: 0;
@@ -99,7 +99,6 @@ p[style*="color: green"] {
   color: white;
 }
 
-/* List Section Styles */
 .list-section {
   max-height: 600px;
   overflow-y: auto;
@@ -140,9 +139,8 @@ p[style*="color: green"] {
   text-decoration: underline;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .container {
     flex-direction: column;
   }
-}
+} */

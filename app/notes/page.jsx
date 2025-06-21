@@ -10,15 +10,11 @@ const Notes = () => {
   const [selectedLevel, setSelectedLevel] = useState(1);
   const [selectedLanguage, setSelectedLanguage] = useState("Sinhala");
   const [searchTerm, setSearchTerm] = useState("");
-  const [token, setToken] = useState("");
   const router = useRouter();
 
-  const backendUrl = process.env.NEXT_PUBLIC_URL; // Ensure this is defined in .env
+  const backendUrl = process.env.NEXT_PUBLIC_URL;
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("accessToken");
-    setToken(storedToken || "");
-
     fetchNotes();
   }, []);
 
@@ -34,16 +30,11 @@ const Notes = () => {
   };
 
   const deleteNote = async (id) => {
-    const confirmDelete = confirm("Are you sure you want to delete this note?");
-    if (!confirmDelete) return;
+    if (!confirm("Are you sure you want to delete this note?")) return;
 
     try {
       const res = await fetch(`${backendUrl}/api/note/${id}`, {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
       });
 
       if (!res.ok) throw new Error("Delete failed");
@@ -83,7 +74,9 @@ const Notes = () => {
         {[1, 2, 3].map((level) => (
           <div key={level}>
             <div
-              className={`sidebar-item ${selectedLevel === level ? "active" : ""}`}
+              className={`sidebar-item ${
+                selectedLevel === level ? "active" : ""
+              }`}
               onClick={() => {
                 setSelectedLevel(level);
                 setSelectedLanguage("Sinhala");
@@ -97,7 +90,9 @@ const Notes = () => {
                 {["Sinhala", "English", "Tamil"].map((language) => (
                   <div
                     key={language}
-                    className={`sidebar-subitem ${selectedLanguage === language ? "active" : ""}`}
+                    className={`sidebar-subitem ${
+                      selectedLanguage === language ? "active" : ""
+                    }`}
                     onClick={() => setSelectedLanguage(language)}
                   >
                     {language}
@@ -111,6 +106,14 @@ const Notes = () => {
 
       {/* Main Area */}
       <main className="main-area">
+        {/* <input
+          type="text"
+          placeholder="Search notes..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ marginBottom: "1rem" }}
+        /> */}
+
         <div className="cardsGrid">
           {filteredNotes.length === 0 && selectedLanguage && (
             <p style={{ marginTop: "2rem" }}>No notes found for this criteria.</p>
@@ -149,25 +152,21 @@ const Notes = () => {
                     <Download size={18} />
                   </a>
 
-                  {token && (
-                    <>
-                      <button
-                        className="btn delete"
-                        onClick={() => deleteNote(note._id)}
-                        title="Delete Note"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+                  <button
+                    className="btn delete"
+                    onClick={() => deleteNote(note._id)}
+                    title="Delete Note"
+                  >
+                    <Trash2 size={18} />
+                  </button>
 
-                      <button
-                        className="btn edit"
-                        onClick={() => editNote(note._id)}
-                        title="Edit Note"
-                      >
-                        <Pencil size={18} />
-                      </button>
-                    </>
-                  )}
+                  <button
+                    className="btn edit"
+                    onClick={() => editNote(note._id)}
+                    title="Edit Note"
+                  >
+                    <Pencil size={18} />
+                  </button>
                 </div>
               </div>
             );

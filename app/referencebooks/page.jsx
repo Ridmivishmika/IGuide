@@ -8,14 +8,11 @@ import "./page.css";
 const ReferenceBooks = () => {
   const [referenceBooks, setReferenceBooks] = useState([]);
   const [selectedLevel, setSelectedLevel] = useState(1);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const router = useRouter();
   const backendUrl = process.env.NEXT_PUBLIC_URL;
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken"); // ✅ FIXED
-    setIsLoggedIn(!!token);
     fetchReferenceBooks();
   }, []);
 
@@ -33,22 +30,11 @@ const ReferenceBooks = () => {
   };
 
   const deleteReferenceBook = async (id) => {
-    const confirmDelete = confirm("Are you sure you want to delete this reference book?");
-    if (!confirmDelete) return;
-
-    const token = localStorage.getItem("accessToken"); // ✅ FIXED
-    if (!token) {
-      alert("Not authorized");
-      return;
-    }
+    if (!confirm("Are you sure you want to delete this reference book?")) return;
 
     try {
       const res = await fetch(`${backendUrl}/api/referencebook/${id}`, {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
       });
 
       if (!res.ok) throw new Error("Delete failed");
@@ -120,25 +106,21 @@ const ReferenceBooks = () => {
                     <Download size={18} />
                   </a>
 
-                  {isLoggedIn && (
-                    <>
-                      <button
-                        className="btn delete"
-                        onClick={() => deleteReferenceBook(book._id)}
-                        title="Delete Reference Book"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+                  <button
+                    className="btn delete"
+                    onClick={() => deleteReferenceBook(book._id)}
+                    title="Delete Reference Book"
+                  >
+                    <Trash2 size={18} />
+                  </button>
 
-                      <button
-                        className="btn edit"
-                        onClick={() => editReferenceBook(book._id)}
-                        title="Edit Reference Book"
-                      >
-                        <Pencil size={18} />
-                      </button>
-                    </>
-                  )}
+                  <button
+                    className="btn edit"
+                    onClick={() => editReferenceBook(book._id)}
+                    title="Edit Reference Book"
+                  >
+                    <Pencil size={18} />
+                  </button>
                 </div>
               </div>
             ))

@@ -27,7 +27,7 @@ export const authOptions = {
           if (!passwordMatch) {
             throw new Error("Passwords do not match");
           } else {
-            const { password, ...currentUser } = user._doc;
+            const { password: hashedPassword, ...currentUser } = user._doc;
             const accessToken = signJwtToken(currentUser, { expiresIn: "7d" });
 
             return {
@@ -36,36 +36,34 @@ export const authOptions = {
             };
           }
         } catch (error) {
-          console.log(error);
+          console.log("Authorize error:", error);
+          return null;
         }
       },
     }),
   ],
+
   pages: {
     signIn: "/login",
   },
+
   secret: process.env.NEXTAUTH_SECRET,
+
+  session: {
+    strategy: "jwt", // Only use JWT, no sessions
+  },
+
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.accessToken = user.accessToken;
         token._id = user._id;
       }
-
       return token;
     },
-
-    async session({ session, token }) {
-      if (token) {
-        session.user._id = token._id;
-        session.user.accessToken = token.accessToken;
-      }
-
-      return session;
-    },
+    // No need for session callback if you don’t use useSession()
   },
 };
 
 const handler = NextAuth(authOptions);
-
 export { handler as GET, handler as POST };

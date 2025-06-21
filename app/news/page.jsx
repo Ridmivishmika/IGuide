@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -8,20 +8,17 @@ import "./page.css";
 
 const News = () => {
   const [newsList, setNewsList] = useState([]);
-  const [adsList, setAdsList] = useState([]);
+  const [leftAdsList, setLeftAdsList] = useState([]);
+  const [rightAdsList, setRightAdsList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [token, setToken] = useState("");
   const router = useRouter();
 
-  const backendUrl = process.env.NEXT_PUBLIC_URL; // Make sure this is defined in .env
+  const backendUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
 
   useEffect(() => {
-    // Get token from localStorage once on mount
-    const storedToken = localStorage.getItem("accessToken");
-    setToken(storedToken || "");
-
     fetchNews();
-    fetchAds();
+    fetchLeftAds();
+    fetchRightAds();
   }, []);
 
   const fetchNews = async () => {
@@ -35,54 +32,51 @@ const News = () => {
     }
   };
 
-  const fetchAds = async () => {
+  // For demo, using same ads API but split into left/right
+  // You can change API or filter ads differently
+  const fetchLeftAds = async () => {
     try {
-      const res = await fetch(`${backendUrl}/api/ads`, { cache: "no-store" });
-      if (!res.ok) throw new Error("Failed to fetch ads");
+      const res = await fetch(`${backendUrl}/api/ads?position=left`, { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to fetch left ads");
       const data = await res.json();
-      setAdsList(data);
+      setLeftAdsList(data);
     } catch (error) {
-      console.error("Error fetching ads:", error);
+      console.error("Error fetching left ads:", error);
+    }
+  };
+
+  const fetchRightAds = async () => {
+    try {
+      const res = await fetch(`${backendUrl}/api/ads?position=right`, { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to fetch right ads");
+      const data = await res.json();
+      setRightAdsList(data);
+    } catch (error) {
+      console.error("Error fetching right ads:", error);
     }
   };
 
   const handleDeleteNews = async (id) => {
-    const confirmDelete = confirm("Are you sure you want to delete this news?");
-    if (!confirmDelete) return;
-
+    if (!confirm("Are you sure you want to delete this news?")) return;
     try {
-      const res = await fetch(`${backendUrl}/api/news/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
+      const res = await fetch(`${backendUrl}/api/news/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete news");
-
       setNewsList((prev) => prev.filter((item) => item._id !== id));
     } catch (error) {
       console.error("Delete error:", error);
     }
   };
 
-  const handleDeleteAd = async (id) => {
-    const confirmDelete = confirm("Are you sure you want to delete this ad?");
-    if (!confirmDelete) return;
-
+  const handleDeleteAd = async (id, side) => {
+    if (!confirm("Are you sure you want to delete this ad?")) return;
     try {
-      const res = await fetch(`${backendUrl}/api/ads/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
+      const res = await fetch(`${backendUrl}/api/ads/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete ad");
-
-      setAdsList((prev) => prev.filter((item) => item._id !== id));
+      if (side === "left") {
+        setLeftAdsList((prev) => prev.filter((item) => item._id !== id));
+      } else {
+        setRightAdsList((prev) => prev.filter((item) => item._id !== id));
+      }
     } catch (error) {
       console.error("Delete ad error:", error);
     }
@@ -92,7 +86,7 @@ const News = () => {
     router.push(`/addnews?editId=${id}`);
   };
 
-  const handleEditAd = (id) => {
+  const handleEditAd = (id, side) => {
     router.push(`/addad?editId=${id}`);
   };
 
@@ -104,43 +98,70 @@ const News = () => {
 
   return (
     <div className="news-page">
-      <div className="search-bar">
-        <input
-          type="text"
-          placeholder="Search news..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
+      {/* Left Sidebar Ads */}
+      <aside className="news-ads left-ads">
+        {/* <h3>Left Ads</h3> */}
+        {leftAdsList.length > 0 ? (
+          leftAdsList.map((ad) => (
+            <div key={ad._id} className="ad-card">
+              <h4>{ad.name}</h4>
+              {ad.image?.url ? (
+                <Image src={ad.image.url} alt={ad.name} width={150} height={100} className="rounded object-cover" />
+              ) : (
+                <p className="no-data">No image available</p>
+              )}
+              <div className="news-actions">
+                <button
+                  className="edit-btn"
+                  onClick={() => handleEditAd(ad._id, "left")}
+                  title="Edit Ad"
+                >
+                  <Pencil size={16} />
+                </button>
+                <button
+                  className="delete-btn"
+                  onClick={() => handleDeleteAd(ad._id, "left")}
+                  title="Delete Ad"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="no-data">No ads available.</p>
+        )}
+      </aside>
 
-      {/* News Section */}
+      {/* Main News Section */}
       <main className="news-main">
+        {/* <div className="news-search">
+          <input
+            type="text"
+            placeholder="Search news..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div> */}
         <h2>News</h2>
         <div className="news-grid">
           {filteredNews.length > 0 ? (
             filteredNews.map((news) => (
               <div key={news._id} className="news-card">
-                <h3>{news.name}</h3>
+                <h2>{news.name}</h2>
                 <p>{news.description}</p>
-
-                {token && (
-                  <div className="news-actions">
-                    <button
-                      className="edit-btn"
-                      onClick={() => handleEditNews(news._id)}
-                      title="Edit"
-                    >
-                      <Pencil size={16} />
-                    </button>
-                    <button
-                      className="delete-btn"
-                      onClick={() => handleDeleteNews(news._id)}
-                      title="Delete"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                )}
+                <div className="news-actions">
+                  <button className="edit-btn" onClick={() => handleEditNews(news._id)} title="Edit">
+                    <Pencil size={16} />
+                  </button>
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDeleteNews(news._id)}
+                    title="Delete"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </div>
             ))
           ) : (
@@ -149,44 +170,34 @@ const News = () => {
         </div>
       </main>
 
-      {/* Ads Section */}
-      <aside className="news-ads">
-        <h3>Sponsored Ads</h3>
-        {adsList.length > 0 ? (
-          adsList.map((ad) => (
+      {/* Right Sidebar Ads */}
+      <aside className="news-ads right-ads">
+        {/* <h3>Right Ads</h3> */}
+        {rightAdsList.length > 0 ? (
+          rightAdsList.map((ad) => (
             <div key={ad._id} className="ad-card">
               <h4>{ad.name}</h4>
               {ad.image?.url ? (
-                <Image
-                  src={ad.image.url}
-                  alt={ad.name}
-                  width={300}
-                  height={200}
-                  className="rounded object-cover w-full h-auto"
-                />
+                <Image src={ad.image.url} alt={ad.name} width={150} height={100} className="rounded object-cover" />
               ) : (
                 <p className="no-data">No image available</p>
               )}
-
-              {token && (
-                <div className="news-actions">
-                  {/* Uncomment if edit ad button is needed */}
-                  {/* <button
-                    className="edit-btn"
-                    onClick={() => handleEditAd(ad._id)}
-                    title="Edit Ad"
-                  >
-                    <Pencil size={16} />
-                  </button> */}
-                  <button
-                    className="delete-btn"
-                    onClick={() => handleDeleteAd(ad._id)}
-                    title="Delete Ad"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              )}
+              <div className="news-actions">
+                <button
+                  className="edit-btn"
+                  onClick={() => handleEditAd(ad._id, "right")}
+                  title="Edit Ad"
+                >
+                  <Pencil size={16} />
+                </button>
+                <button
+                  className="delete-btn"
+                  onClick={() => handleDeleteAd(ad._id, "right")}
+                  title="Delete Ad"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
             </div>
           ))
         ) : (

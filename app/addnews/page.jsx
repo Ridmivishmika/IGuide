@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import './page.css'
+import './page.css';
+
 const AddNews = () => {
   const [formData, setFormData] = useState({ name: "", description: "" });
   const [isUpdating, setIsUpdating] = useState(false);
@@ -39,24 +40,20 @@ const AddNews = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("Unauthorized: Please log in.");
-      return;
-    }
 
     try {
       const res = await fetch(`${backendUrl}/api/news${isUpdating ? `/${editId}` : ""}`, {
         method: isUpdating ? "PUT" : "POST",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+          // ❌ No Authorization header
         },
         body: JSON.stringify(formData),
       });
 
       if (!res.ok) throw new Error("Failed to submit news");
-      router.push("/news");
+
+      router.push("/news"); // ✅ Redirect after submit
     } catch (err) {
       console.error("Submission error:", err);
     }

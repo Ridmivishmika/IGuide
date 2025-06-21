@@ -1,21 +1,31 @@
 /* Overall Layout */
 .news-page {
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   padding: 1rem;
-  background-color: #ffffff;
+  background-color: #fff;
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
-@media (min-width: 768px) {
-  .news-page {
-    flex-direction: row;
-  }
+/* Left and Right Sidebars */
+.news-ads {
+  flex: 1;
+  max-width: 20%; /* approx 1/5 */
 }
 
-/* Main News Area */
+.left-ads {
+  margin-right: 1rem;
+}
+
+.right-ads {
+  margin-left: 1rem;
+}
+
+/* Main News Section */
 .news-main {
-  flex: 4;
+  flex: 3;
+  max-width: 60%; /* approx 3/5 */
 }
 
 .news-search {
@@ -24,12 +34,12 @@
 
 .news-search input {
   width: 100%;
-  max-width: 60%;
   padding: 0.5rem 0.75rem;
   border: 2px solid #640259;
   border-radius: 8px;
   font-size: 1rem;
   outline: none;
+  box-sizing: border-box;
 }
 
 .news-search input:focus {
@@ -37,7 +47,7 @@
   box-shadow: 0 0 0 2px rgba(196, 62, 195, 0.3);
 }
 
-/* News Cards */
+/* News Cards Grid */
 .news-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -50,6 +60,7 @@
   }
 }
 
+/* Individual News Card */
 .news-card {
   border: 2px solid #640259;
   padding: 1rem;
@@ -57,6 +68,9 @@
   background-color: #fdf9fd;
   box-shadow: 0 2px 6px rgba(100, 2, 89, 0.1);
   transition: box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .news-card:hover {
@@ -74,24 +88,7 @@
   color: #333;
 }
 
-.news-card strong {
-  color: #C43EC3;
-}
-
-/* Sidebar Ads */
-.news-ads {
-  flex: 1;
-}
-
-.news-ads h3 {
-  font-size: 1.125rem;
-  font-weight: bold;
-  color: #640259;
-  margin-bottom: 1rem;
-  border-bottom: 2px solid #C43EC3;
-  padding-bottom: 0.25rem;
-}
-
+/* Ad Cards */
 .ad-card {
   border: 2px solid #640259;
   border-radius: 10px;
@@ -99,6 +96,10 @@
   background-color: #f9f5fa;
   box-shadow: 0 2px 6px rgba(100, 2, 89, 0.08);
   transition: box-shadow 0.3s ease;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .ad-card:hover {
@@ -125,6 +126,7 @@
   font-style: italic;
 }
 
+/* Action Buttons */
 .news-actions {
   margin-top: 10px;
   display: flex;
@@ -145,4 +147,22 @@
 
 .delete-btn:hover {
   color: #dc3545;
+}
+
+/* Responsive for smaller screens */
+@media (max-width: 767px) {
+  .news-page {
+    flex-direction: column;
+  }
+  .news-ads,
+  .news-main {
+    max-width: 100%;
+  }
+  .left-ads,
+  .right-ads {
+    margin: 0 0 1rem 0;
+  }
+  .news-grid {
+    grid-template-columns: 1fr;
+  }
 }

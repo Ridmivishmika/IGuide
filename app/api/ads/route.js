@@ -1,8 +1,5 @@
-// app/api/ads/route.js
-
 import { connect } from "@/lib/db";
 import { NextResponse } from "next/server";
-import { verifyJwtToken } from "@/lib/jwt";
 import Ad from "@/models/Ad";
 
 export async function GET() {
@@ -19,16 +16,21 @@ export async function GET() {
 export async function POST(req) {
   await connect();
 
-  const accessToken = req.headers.get("authorization");
-  const token = accessToken?.split(" ")[1];
-  const decodedToken = verifyJwtToken(token);
-
-  if (!accessToken || !decodedToken) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+  let body;
+  try {
+    body = await req.json();
+  } catch (error) {
+    return NextResponse.json({ error: "Invalid JSON format" }, { status: 400 });
   }
 
   try {
-    const body = await req.json();
+    const { title, description } = body;
+
+    // Validate required fields
+    if (!title || !description) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
     const newAd = await Ad.create(body);
     return NextResponse.json(newAd, { status: 201 });
   } catch (error) {

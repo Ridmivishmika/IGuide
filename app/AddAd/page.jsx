@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import './page.css'
+import './page.css';
 
 const AddAds = () => {
   const [formData, setFormData] = useState({ name: "", image: null });
@@ -11,7 +11,7 @@ const AddAds = () => {
   const [editId, setEditId] = useState(null);
   const router = useRouter();
 
-  const backendUrl = process.env.NEXT_PUBLIC_URL; // Update .env if needed
+  const backendUrl = process.env.NEXT_PUBLIC_URL; // Make sure this is set in your .env.local
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -48,11 +48,6 @@ const AddAds = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("Unauthorized: Please log in.");
-      return;
-    }
 
     const form = new FormData();
     form.append("name", formData.name);
@@ -61,14 +56,12 @@ const AddAds = () => {
     try {
       const res = await fetch(`${backendUrl}/api/ads${isUpdating ? `/${editId}` : ""}`, {
         method: isUpdating ? "PUT" : "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: form,
+        body: form, // ❌ No Authorization header
       });
 
       if (!res.ok) throw new Error("Failed to submit ad");
-      router.push("/ad");
+
+      router.push("/ad"); // ✅ Redirect after submit
     } catch (err) {
       console.error("Submission error:", err);
     }

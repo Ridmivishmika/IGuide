@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Input from "@/components/Input";
 import { useRouter, useSearchParams } from "next/navigation";
+import styles from "./AddReferenceBookForm.module.css";
 
 const initialState = {
   name: "",
@@ -25,7 +26,6 @@ const ReferenceBookPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editIdFromParams = searchParams.get("editId");
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   useEffect(() => {
     if (editIdFromParams) {
@@ -112,7 +112,6 @@ const ReferenceBookPage = () => {
         method: editingId ? "PATCH" : "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });
@@ -133,22 +132,51 @@ const ReferenceBookPage = () => {
     setIsLoading(false);
   };
 
-  if (!token) return <p>Access denied</p>;
-
   return (
-    <div className="referencebook-page">
-      <div className="referencebook-form-card">
+    <div className={styles.referencebookPage}>
+      <div className={styles.referencebookFormCard}>
         <h2>{editingId ? "Update Reference Book" : "Add Reference Book"}</h2>
-        <form onSubmit={handleSubmit}>
-          <Input label="Name" type="text" name="name" onChange={handleChange} value={state.name} />
-          <Input label="Level" type="number" name="level" onChange={handleChange} value={state.level} />
-          <Input label="Description" type="text" name="description" onChange={handleChange} value={state.description} />
-          <label>Upload Reference Book (PDF)</label>
-          <input type="file" name="referenceBook" accept=".pdf" onChange={handleChange} />
-          {state.referenceBook && <p>Selected file: {state.referenceBook.name}</p>}
-          {error && <p style={{ color: "red" }}>{error}</p>}
-          {success && <p style={{ color: "green" }}>{success}</p>}
-          <button type="submit" disabled={isLoading}>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <Input
+            label="Name"
+            type="text"
+            name="name"
+            onChange={handleChange}
+            value={state.name}
+            className={styles.input}
+          />
+          <Input
+            label="Level"
+            type="number"
+            name="level"
+            onChange={handleChange}
+            value={state.level}
+            className={styles.input}
+          />
+          <Input
+            label="Description"
+            type="text"
+            name="description"
+            onChange={handleChange}
+            value={state.description}
+            className={styles.input}
+          />
+          <label className={styles.fileLabel}>Upload Reference Book (PDF)</label>
+          <input
+            type="file"
+            name="referenceBook"
+            accept=".pdf"
+            onChange={handleChange}
+            className={styles.fileInput}
+          />
+          {state.referenceBook && (
+            <p className={styles.selectedFile}>
+              Selected file: {state.referenceBook.name}
+            </p>
+          )}
+          {error && <p className={styles.error}>{error}</p>}
+          {success && <p className={styles.success}>{success}</p>}
+          <button type="submit" disabled={isLoading} className={styles.submitButton}>
             {isLoading ? "Processing..." : editingId ? "Update" : "Add"}
           </button>
         </form>

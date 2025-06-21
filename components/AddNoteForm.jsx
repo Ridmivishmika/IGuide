@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Input from "@/components/Input";
 import { useRouter, useSearchParams } from "next/navigation";
-import "./AddNoteForm.module.css";
+import styles from "./AddNoteForm.module.css";
 
 const initialState = {
   name: "",
@@ -22,19 +22,14 @@ const AddNoteForm = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [deletingId, setDeletingId] = useState(null);
   const [editingId, setEditingId] = useState(null);
-  const [token, setToken] = useState("");
 
   const router = useRouter();
   const searchParams = useSearchParams();
   const editIdFromQuery = searchParams.get("editId");
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    if (!storedToken) return;
-    setToken(storedToken);
-    fetchNotes(storedToken);
+    fetchNotes();
   }, []);
 
   useEffect(() => {
@@ -46,13 +41,9 @@ const AddNoteForm = () => {
     }
   }, [notes, editIdFromQuery]);
 
-  const fetchNotes = async (authToken) => {
+  const fetchNotes = async () => {
     try {
-      const res = await fetch("/api/note", {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
+      const res = await fetch("/api/note");
       if (!res.ok) throw new Error("Failed to fetch notes");
       const data = await res.json();
       setNotes(data);
@@ -121,21 +112,21 @@ const AddNoteForm = () => {
       };
 
       let response;
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      };
 
       if (editingId) {
         response = await fetch(`/api/note/${editingId}`, {
           method: "PATCH",
-          headers,
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify(payload),
         });
       } else {
         response = await fetch("/api/note", {
           method: "POST",
-          headers,
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify(payload),
         });
       }
@@ -144,7 +135,7 @@ const AddNoteForm = () => {
         setSuccess(editingId ? "Note updated successfully" : "Note added successfully");
         setState(initialState);
         setEditingId(null);
-        fetchNotes(token);
+        fetchNotes();
         setTimeout(() => {
           router.refresh();
         }, 1500);
@@ -180,36 +171,76 @@ const AddNoteForm = () => {
   };
 
   return (
-    <div className="container">
-      <div className="form-section">
-        <h2>{editingId ? "Update Note" : "Add Note"}</h2>
-        <form onSubmit={handleSubmit}>
-          <Input label="Name" type="text" name="name" onChange={handleChange} value={state.name} />
+    <div className={styles.container}>
+      <div className={styles.formSection}>
+        <h2 className={styles.heading}>{editingId ? "Update Note" : "Add Note"}</h2>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <Input
+            label="Name"
+            type="text"
+            name="name"
+            onChange={handleChange}
+            value={state.name}
+            className={styles.input}
+          />
 
-          <label htmlFor="level">Level</label>
-          <select name="level" value={state.level} onChange={handleChange} required>
+          <label htmlFor="level" className={styles.label}>
+            Level
+          </label>
+          <select
+            name="level"
+            value={state.level}
+            onChange={handleChange}
+            required
+            className={styles.input} // Same style for select as input for consistency
+          >
             <option value="">Select level</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
           </select>
 
-          <Input label="Year" type="number" name="year" onChange={handleChange} value={state.year} />
+          <Input
+            label="Year"
+            type="number"
+            name="year"
+            onChange={handleChange}
+            value={state.year}
+            className={styles.input}
+          />
 
-          <label htmlFor="language">Language</label>
-          <select name="language" value={state.language} onChange={handleChange} required>
+          <label htmlFor="language" className={styles.label}>
+            Language
+          </label>
+          <select
+            name="language"
+            value={state.language}
+            onChange={handleChange}
+            required
+            className={styles.input} // Same style here too
+          >
             <option value="">Select Language</option>
             <option value="Sinhala">Sinhala</option>
             <option value="English">English</option>
             <option value="Tamil">Tamil</option>
           </select>
 
-          <label>Upload Note (PDF) {editingId ? "(leave empty to keep current)" : ""}</label>
-          <input onChange={handleChange} type="file" name="noteFile" accept=".pdf" />
+          <label className={styles.label}>
+            Upload Note (PDF) {editingId ? "(leave empty to keep current)" : ""}
+          </label>
+          <input
+            onChange={handleChange}
+            type="file"
+            name="noteFile"
+            accept=".pdf"
+            className={styles.fileInput}
+          />
 
-          {state.noteFile && typeof state.noteFile !== "string" && <p>Selected file: {state.noteFile.name}</p>}
+          {state.noteFile && typeof state.noteFile !== "string" && (
+            <p className={styles.message}>Selected file: {state.noteFile.name}</p>
+          )}
           {editingId && typeof state.noteFile === "string" && (
-            <p>
+            <p className={styles.message}>
               Current Note:{" "}
               <a href={state.noteFile} target="_blank" rel="noopener noreferrer">
                 View Note
@@ -217,25 +248,36 @@ const AddNoteForm = () => {
             </p>
           )}
 
-          {error && <p style={{ color: "red" }}>{error}</p>}
-          {success && <p style={{ color: "green" }}>{success}</p>}
+          {error && (
+            <p className={`${styles.message} ${styles.error}`}>
+              {error}
+            </p>
+          )}
+          {success && (
+            <p className={`${styles.message} ${styles.success}`}>
+              {success}
+            </p>
+          )}
 
-          <button type="submit" disabled={isLoading}>
-            {isLoading ? (editingId ? "Updating..." : "Uploading...") : editingId ? "Update" : "Add"}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className={styles.button}
+          >
+            {isLoading
+              ? editingId
+                ? "Updating..."
+                : "Uploading..."
+              : editingId
+              ? "Update"
+              : "Add"}
           </button>
+
           {editingId && (
             <button
               type="button"
               onClick={cancelEditing}
-              style={{
-                marginLeft: "1rem",
-                padding: "0.4rem 0.8rem",
-                backgroundColor: "#666",
-                color: "white",
-                border: "none",
-                borderRadius: "0.4rem",
-                cursor: "pointer",
-              }}
+              className={styles.cancelButton}
             >
               Cancel
             </button>
