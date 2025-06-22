@@ -8,12 +8,27 @@ import "./page.css";
 const ReferenceBooks = () => {
   const [referenceBooks, setReferenceBooks] = useState([]);
   const [selectedLevel, setSelectedLevel] = useState(1);
-
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
   const backendUrl = process.env.NEXT_PUBLIC_URL;
 
   useEffect(() => {
     fetchReferenceBooks();
+
+    // Check if user is logged in by token presence
+    const token = localStorage.getItem("accessToken");
+    setIsLoggedIn(!!token);
+
+    // Listen to token changes from other tabs/windows
+    const onStorage = () => {
+      const token = localStorage.getItem("accessToken");
+      setIsLoggedIn(!!token);
+    };
+    window.addEventListener("storage", onStorage);
+
+    return () => {
+      window.removeEventListener("storage", onStorage);
+    };
   }, []);
 
   const fetchReferenceBooks = async () => {
@@ -33,8 +48,17 @@ const ReferenceBooks = () => {
     if (!confirm("Are you sure you want to delete this reference book?")) return;
 
     try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        alert("You must be logged in to delete a reference book.");
+        return;
+      }
+
       const res = await fetch(`${backendUrl}/api/referencebook/${id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!res.ok) throw new Error("Delete failed");
@@ -42,10 +66,15 @@ const ReferenceBooks = () => {
       setReferenceBooks((prevBooks) => prevBooks.filter((book) => book._id !== id));
     } catch (error) {
       console.error("Error deleting reference book:", error);
+      alert("Failed to delete reference book.");
     }
   };
 
   const editReferenceBook = (id) => {
+    if (!isLoggedIn) {
+      alert("You must be logged in to edit a reference book.");
+      return;
+    }
     router.push(`/addreferencebook?editId=${id}`);
   };
 
@@ -106,21 +135,25 @@ const ReferenceBooks = () => {
                     <Download size={18} />
                   </a>
 
-                  <button
-                    className="btn delete"
-                    onClick={() => deleteReferenceBook(book._id)}
-                    title="Delete Reference Book"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  {isLoggedIn && (
+                    <>
+                      <button
+                        className="btn delete"
+                        onClick={() => deleteReferenceBook(book._id)}
+                        title="Delete Reference Book"
+                      >
+                        <Trash2 size={18} />
+                      </button>
 
-                  <button
-                    className="btn edit"
-                    onClick={() => editReferenceBook(book._id)}
-                    title="Edit Reference Book"
-                  >
-                    <Pencil size={18} />
-                  </button>
+                      <button
+                        className="btn edit"
+                        onClick={() => editReferenceBook(book._id)}
+                        title="Edit Reference Book"
+                      >
+                        <Pencil size={18} />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))

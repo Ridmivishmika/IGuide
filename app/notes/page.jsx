@@ -10,9 +10,16 @@ const Notes = () => {
   const [selectedLevel, setSelectedLevel] = useState(1);
   const [selectedLanguage, setSelectedLanguage] = useState("Sinhala");
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
   const backendUrl = process.env.NEXT_PUBLIC_URL;
+
+  useEffect(() => {
+    // Check if token exists in localStorage to set logged in state
+    const token = localStorage.getItem("accessToken");
+    setIsLoggedIn(!!token);
+  }, []);
 
   useEffect(() => {
     fetchNotes();
@@ -35,6 +42,9 @@ const Notes = () => {
     try {
       const res = await fetch(`${backendUrl}/api/note/${id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
       });
 
       if (!res.ok) throw new Error("Delete failed");
@@ -42,6 +52,7 @@ const Notes = () => {
       setNotes((prevNotes) => prevNotes.filter((note) => note._id !== id));
     } catch (error) {
       console.error("Error deleting note:", error);
+      alert("Failed to delete note.");
     }
   };
 
@@ -106,6 +117,7 @@ const Notes = () => {
 
       {/* Main Area */}
       <main className="main-area">
+        {/* Uncomment if you want search */}
         {/* <input
           type="text"
           placeholder="Search notes..."
@@ -116,7 +128,9 @@ const Notes = () => {
 
         <div className="cardsGrid">
           {filteredNotes.length === 0 && selectedLanguage && (
-            <p style={{ marginTop: "2rem" }}>No notes found for this criteria.</p>
+            <p style={{ marginTop: "2rem" }}>
+              No notes found for this criteria.
+            </p>
           )}
 
           {filteredNotes.map((note) => {
@@ -152,21 +166,25 @@ const Notes = () => {
                     <Download size={18} />
                   </a>
 
-                  <button
-                    className="btn delete"
-                    onClick={() => deleteNote(note._id)}
-                    title="Delete Note"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  {isLoggedIn && (
+                    <>
+                      <button
+                        className="btn delete"
+                        onClick={() => deleteNote(note._id)}
+                        title="Delete Note"
+                      >
+                        <Trash2 size={18} />
+                      </button>
 
-                  <button
-                    className="btn edit"
-                    onClick={() => editNote(note._id)}
-                    title="Edit Note"
-                  >
-                    <Pencil size={18} />
-                  </button>
+                      <button
+                        className="btn edit"
+                        onClick={() => editNote(note._id)}
+                        title="Edit Note"
+                      >
+                        <Pencil size={18} />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             );

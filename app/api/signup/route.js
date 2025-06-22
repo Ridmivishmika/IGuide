@@ -1,26 +1,47 @@
-// http://localhost:3000/api/signup
 import User from "@/models/User";
-import bcrypt, { hash } from "bcrypt";
+import bcrypt from "bcrypt";
 import { connect } from "@/lib/db";
 import { NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
 
 export async function POST(req) {
   try {
     await connect();
-    const { name, email,user_name, password } = await req.json();
+    const { name, email, user_name, password } = await req.json();
 
+    // Check for existing user
     const isExisting = await User.findOne({ email });
-
     if (isExisting) {
-      return NextResponse.json({ ErrorMessage: "User already exists" });
+      return NextResponse.json(
+        { error: "User already exists" },
+        { status: 400 }
+      );
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10)
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await User.create({ name, email,user_name, password: hashedPassword });
+    // Create new user
+    const newUser = await User.create({
+      name,
+      email,
+      user_name,
+      password: hashedPassword,
+    });
 
-    return NextResponse.json(newUser, { status: 201 });
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: newUser._id, email: newUser.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    return NextResponse.json({ token }, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ message: "POST Error (Sign up)" });
+    console.error("Signup Error:", error);
+    return NextResponse.json(
+      { error: "Server error during signup" },
+      { status: 500 }
+    );
   }
 }

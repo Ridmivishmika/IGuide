@@ -4,12 +4,11 @@ import React, { useEffect, useState } from "react";
 import Input from "./Input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
 import styles from "./LoginForm.module.css";
 
 const initialState = {
   email: "",
-  password: ""
+  password: "",
 };
 
 const LoginForm = () => {
@@ -28,6 +27,7 @@ const LoginForm = () => {
 
   const handleChange = (event) => {
     setError("");
+    setSuccess("");
     setState({ ...state, [event.target.name]: event.target.value });
   };
 
@@ -48,25 +48,28 @@ const LoginForm = () => {
 
     try {
       setIsLoading(true);
-      const res = await signIn("credentials", {
-        email,
-        password,
-        redirect: false
+
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (res?.error) {
-        setError("Invalid credentials");
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Login failed");
         setIsLoading(false);
         return;
       }
 
-      // ✅ Store token (simulate real JWT login here)
-      localStorage.setItem("accessToken", "example_token_123");
+      // ✅ Store JWT in localStorage
+      localStorage.setItem("accessToken", data.token);
 
-      // ✅ Notify Navbar to refresh
+      // ✅ Dispatch event so other components (like Navbar) can respond
       window.dispatchEvent(new Event("storage"));
 
-      // ✅ Redirect to protected route
+      setSuccess("Login successful!");
       router.push("/addnote");
     } catch (error) {
       console.error(error);
@@ -77,7 +80,7 @@ const LoginForm = () => {
   };
 
   return (
-    <div className={styles['note-page-container']}>
+    <div className={styles["note-page-container"]}>
       <h2>Login</h2>
       <section>
         <form onSubmit={handleSubmit}>
@@ -96,13 +99,18 @@ const LoginForm = () => {
             value={state.password}
           />
 
-          {error && <p className={styles['error-message']}>{error}</p>}
-          {success && <p className={styles['success-message']}>{success}</p>}
+          {error && <p className={styles["error-message"]}>{error}</p>}
+          {success && <p className={styles["success-message"]}>{success}</p>}
 
-          <button type="submit">{isLoading ? "Loading..." : "Login"}</button>
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? "Loading..." : "Login"}
+          </button>
+
           <p>
-            Haven't Account?
-            <Link href="/signup" className={styles.link}>Signup</Link>
+            Haven't Account?{" "}
+            <Link href="/signup" className={styles.link}>
+              Signup
+            </Link>
           </p>
         </form>
       </section>

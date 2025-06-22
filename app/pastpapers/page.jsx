@@ -9,12 +9,28 @@ const Pastpapers = () => {
   const [pastpapers, setPastpapers] = useState([]);
   const [selectedLevel, setSelectedLevel] = useState(1);
   const [selectedLanguage, setSelectedLanguage] = useState("Sinhala");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
   const backendUrl = process.env.NEXT_PUBLIC_URL;
 
   useEffect(() => {
     fetchPastpapers();
+
+    // Check token presence to toggle login state
+    const token = localStorage.getItem("accessToken");
+    setIsLoggedIn(!!token);
+
+    // Listen for login/logout events (storage event) from other tabs/windows
+    const onStorage = () => {
+      const token = localStorage.getItem("accessToken");
+      setIsLoggedIn(!!token);
+    };
+    window.addEventListener("storage", onStorage);
+
+    return () => {
+      window.removeEventListener("storage", onStorage);
+    };
   }, []);
 
   const fetchPastpapers = async () => {
@@ -32,8 +48,17 @@ const Pastpapers = () => {
     if (!confirm("Are you sure you want to delete this paper?")) return;
 
     try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        alert("You must be logged in to delete a paper.");
+        return;
+      }
+
       const res = await fetch(`${backendUrl}/api/pastpaper/${id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!res.ok) throw new Error("Delete failed");
@@ -41,10 +66,15 @@ const Pastpapers = () => {
       setPastpapers((prev) => prev.filter((paper) => paper._id !== id));
     } catch (error) {
       console.error("Error deleting paper:", error);
+      alert("Failed to delete paper.");
     }
   };
 
   const editPaper = (id) => {
+    if (!isLoggedIn) {
+      alert("You must be logged in to edit a paper.");
+      return;
+    }
     router.push(`/addpastpaper?editId=${id}`);
   };
 
@@ -74,9 +104,7 @@ const Pastpapers = () => {
                 {["Sinhala", "English", "Tamil"].map((language) => (
                   <div
                     key={language}
-                    className={`sidebar-subitem ${
-                      selectedLanguage === language ? "active" : ""
-                    }`}
+                    className={`sidebar-subitem ${selectedLanguage === language ? "active" : ""}`}
                     onClick={() => setSelectedLanguage(language)}
                   >
                     {language}
@@ -124,21 +152,25 @@ const Pastpapers = () => {
                     <Download color="#640259" size={18} style={{ marginRight: "0.5rem" }} />
                   </a>
 
-                  <button
-                    className="btn delete"
-                    onClick={() => deletePaper(paper._id)}
-                    title="Delete Paper"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  {isLoggedIn && (
+                    <>
+                      <button
+                        className="btn delete"
+                        onClick={() => deletePaper(paper._id)}
+                        title="Delete Paper"
+                      >
+                        <Trash2 size={18} />
+                      </button>
 
-                  <button
-                    className="btn edit"
-                    onClick={() => editPaper(paper._id)}
-                    title="Edit Paper"
-                  >
-                    <Pencil size={18} />
-                  </button>
+                      <button
+                        className="btn edit"
+                        onClick={() => editPaper(paper._id)}
+                        title="Edit Paper"
+                      >
+                        <Pencil size={18} />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))

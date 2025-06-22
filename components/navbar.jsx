@@ -4,13 +4,13 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from './navbar.module.css';
 import { usePathname, useRouter } from 'next/navigation';
-import { signOut } from 'next-auth/react';
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const isAdminRoute = pathname.startsWith('/admin');
+
+  const isAdminRoute = pathname.startsWith("/admin");
 
   useEffect(() => {
     const checkToken = () => {
@@ -19,16 +19,16 @@ const Navbar = () => {
     };
 
     checkToken();
-    window.addEventListener('storage', checkToken); // Sync across tabs
+    window.addEventListener('storage', checkToken);
 
     return () => {
       window.removeEventListener('storage', checkToken);
     };
   }, [pathname]);
 
-  const handleSignOut = async () => {
+  const handleLogout = () => {
     localStorage.removeItem('accessToken');
-    await signOut({ redirect: false });
+    window.dispatchEvent(new Event('storage'));
     setIsLoggedIn(false);
     router.push('/');
   };
@@ -46,7 +46,6 @@ const Navbar = () => {
 
           {isLoggedIn && (
             <>
-              
               <li className={styles.navItem}><Link href="/addpastpaper">Add Past Paper</Link></li>
               <li className={styles.navItem}><Link href="/addnote">Add Note</Link></li>
               <li className={styles.navItem}><Link href="/addreferencebook">Add Reference Books</Link></li>
@@ -54,7 +53,7 @@ const Navbar = () => {
               <li className={styles.navItem}><Link href="/addnews">Add News</Link></li>
               <li
                 className={styles.navItem}
-                onClick={handleSignOut}
+                onClick={handleLogout}
                 style={{ cursor: 'pointer' }}
               >
                 Logout

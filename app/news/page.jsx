@@ -11,6 +11,7 @@ const News = () => {
   const [leftAdsList, setLeftAdsList] = useState([]);
   const [rightAdsList, setRightAdsList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
   const backendUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
@@ -19,6 +20,17 @@ const News = () => {
     fetchNews();
     fetchLeftAds();
     fetchRightAds();
+
+    const token = localStorage.getItem("accessToken");
+    setIsLoggedIn(!!token);
+
+    const handleStorage = () => {
+      const updatedToken = localStorage.getItem("accessToken");
+      setIsLoggedIn(!!updatedToken);
+    };
+
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
   const fetchNews = async () => {
@@ -32,8 +44,6 @@ const News = () => {
     }
   };
 
-  // For demo, using same ads API but split into left/right
-  // You can change API or filter ads differently
   const fetchLeftAds = async () => {
     try {
       const res = await fetch(`${backendUrl}/api/ads?position=left`, { cache: "no-store" });
@@ -59,7 +69,13 @@ const News = () => {
   const handleDeleteNews = async (id) => {
     if (!confirm("Are you sure you want to delete this news?")) return;
     try {
-      const res = await fetch(`${backendUrl}/api/news/${id}`, { method: "DELETE" });
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch(`${backendUrl}/api/news/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!res.ok) throw new Error("Failed to delete news");
       setNewsList((prev) => prev.filter((item) => item._id !== id));
     } catch (error) {
@@ -70,8 +86,15 @@ const News = () => {
   const handleDeleteAd = async (id, side) => {
     if (!confirm("Are you sure you want to delete this ad?")) return;
     try {
-      const res = await fetch(`${backendUrl}/api/ads/${id}`, { method: "DELETE" });
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch(`${backendUrl}/api/ads/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!res.ok) throw new Error("Failed to delete ad");
+
       if (side === "left") {
         setLeftAdsList((prev) => prev.filter((item) => item._id !== id));
       } else {
@@ -98,9 +121,8 @@ const News = () => {
 
   return (
     <div className="news-page">
-      {/* Left Sidebar Ads */}
+      {/* Left Ads */}
       <aside className="news-ads left-ads">
-        {/* <h3>Left Ads</h3> */}
         {leftAdsList.length > 0 ? (
           leftAdsList.map((ad) => (
             <div key={ad._id} className="ad-card">
@@ -110,22 +132,16 @@ const News = () => {
               ) : (
                 <p className="no-data">No image available</p>
               )}
-              <div className="news-actions">
-                <button
-                  className="edit-btn"
-                  onClick={() => handleEditAd(ad._id, "left")}
-                  title="Edit Ad"
-                >
-                  <Pencil size={16} />
-                </button>
-                <button
-                  className="delete-btn"
-                  onClick={() => handleDeleteAd(ad._id, "left")}
-                  title="Delete Ad"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
+              {isLoggedIn && (
+                <div className="news-actions">
+                  <button className="edit-btn" onClick={() => handleEditAd(ad._id, "left")} title="Edit Ad">
+                    <Pencil size={16} />
+                  </button>
+                  <button className="delete-btn" onClick={() => handleDeleteAd(ad._id, "left")} title="Delete Ad">
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              )}
             </div>
           ))
         ) : (
@@ -135,14 +151,6 @@ const News = () => {
 
       {/* Main News Section */}
       <main className="news-main">
-        {/* <div className="news-search">
-          <input
-            type="text"
-            placeholder="Search news..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div> */}
         <h2>News</h2>
         <div className="news-grid">
           {filteredNews.length > 0 ? (
@@ -150,18 +158,16 @@ const News = () => {
               <div key={news._id} className="news-card">
                 <h2>{news.name}</h2>
                 <p>{news.description}</p>
-                <div className="news-actions">
-                  <button className="edit-btn" onClick={() => handleEditNews(news._id)} title="Edit">
-                    <Pencil size={16} />
-                  </button>
-                  <button
-                    className="delete-btn"
-                    onClick={() => handleDeleteNews(news._id)}
-                    title="Delete"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
+                {isLoggedIn && (
+                  <div className="news-actions">
+                    <button className="edit-btn" onClick={() => handleEditNews(news._id)} title="Edit">
+                      <Pencil size={16} />
+                    </button>
+                    <button className="delete-btn" onClick={() => handleDeleteNews(news._id)} title="Delete">
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                )}
               </div>
             ))
           ) : (
@@ -170,9 +176,8 @@ const News = () => {
         </div>
       </main>
 
-      {/* Right Sidebar Ads */}
+      {/* Right Ads */}
       <aside className="news-ads right-ads">
-        {/* <h3>Right Ads</h3> */}
         {rightAdsList.length > 0 ? (
           rightAdsList.map((ad) => (
             <div key={ad._id} className="ad-card">
@@ -182,22 +187,16 @@ const News = () => {
               ) : (
                 <p className="no-data">No image available</p>
               )}
-              <div className="news-actions">
-                <button
-                  className="edit-btn"
-                  onClick={() => handleEditAd(ad._id, "right")}
-                  title="Edit Ad"
-                >
-                  <Pencil size={16} />
-                </button>
-                <button
-                  className="delete-btn"
-                  onClick={() => handleDeleteAd(ad._id, "right")}
-                  title="Delete Ad"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
+              {isLoggedIn && (
+                <div className="news-actions">
+                  <button className="edit-btn" onClick={() => handleEditAd(ad._id, "right")} title="Edit Ad">
+                    <Pencil size={16} />
+                  </button>
+                  <button className="delete-btn" onClick={() => handleDeleteAd(ad._id, "right")} title="Delete Ad">
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              )}
             </div>
           ))
         ) : (

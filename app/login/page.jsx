@@ -1,18 +1,24 @@
-import React from "react";
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import LoginForm from "@/components/LoginForm";
 
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
-import { authOptions } from "../api/auth/[...nextauth]/route";
-const Login = async() =>{
+const Login = () => {
+  const router = useRouter();
 
-    //  const session = await getServerSession(authOptions)
-    //     if(session) redirect("/addnote")
-    return(
-        <div>
-            <LoginForm/>
-        </div>
-    )
-}
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      router.replace("/addnote"); // redirect if already logged in
+    }
+  }, []);
 
-export default Login
+  return (
+    <div>
+      <LoginForm />
+    </div>
+  );
+};
+
+export default Login;
