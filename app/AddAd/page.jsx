@@ -1,9 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import Input from "@/components/Input";
 import { useRouter, useSearchParams } from "next/navigation";
 import './page.css';
+
+const CLOUDINARY_CLOUD_NAME = "dwq5xfmci";
+const UPLOAD_PRESET = "iguide_past_papers";
 
 const initialState = {
   name: "",
@@ -11,17 +14,14 @@ const initialState = {
   _id: null,
 };
 
-const CLOUDINARY_CLOUD_NAME = "dwq5xfmci";
-const UPLOAD_PRESET = "iguide_past_papers";
-
-const AdManager = () => {
+const AdForm = () => {
   const [state, setState] = useState(initialState);
   const [ads, setAds] = useState([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams(); // ❗ Must be wrapped in Suspense
   const editIdFromQuery = searchParams.get("editId");
 
   useEffect(() => {
@@ -130,7 +130,7 @@ const AdManager = () => {
         setSuccess(state._id ? "Ad updated." : "Ad created.");
         setState(initialState);
         setTimeout(() => {
-          router.push("/news"); // ✅ Navigate to news page
+          router.push("/news");
         }, 1000);
       } else {
         setError("Submission failed.");
@@ -159,6 +159,7 @@ const AdManager = () => {
 
         <label htmlFor="photo">Upload Image</label>
         <input type="file" name="photo" accept="image/*" onChange={handleChange} />
+
         {state.photo && typeof state.photo !== "string" && (
           <img
             src={URL.createObjectURL(state.photo)}
@@ -182,6 +183,15 @@ const AdManager = () => {
         </button>
       </form>
     </section>
+  );
+};
+
+// ✅ Wrap with Suspense in exported Client Page
+const AdManager = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AdForm />
+    </Suspense>
   );
 };
 
