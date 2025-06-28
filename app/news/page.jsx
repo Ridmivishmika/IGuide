@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import "./page.css";
+import Footer from "@/components/footer";
 
 const News = () => {
   const [newsList, setNewsList] = useState([]);
@@ -120,6 +121,7 @@ const News = () => {
   );
 
   return (
+    <div>
     <div className="news-page">
       {/* Left Ads */}
       <aside className="news-ads left-ads">
@@ -151,7 +153,7 @@ const News = () => {
 
       {/* Main News Section */}
       <main className="news-main">
-        <h2>News</h2>
+<h2 style={{ textAlign: "center", margin: "1rem 0", color: "#640259" }}>News</h2>
         <div className="news-grid">
           {filteredNews.length > 0 ? (
             filteredNews.map((news) => (
@@ -203,6 +205,8 @@ const News = () => {
           <p className="no-data">No ads available.</p>
         )}
       </aside>
+    </div>
+    <Footer/>
     </div>
   );
 };

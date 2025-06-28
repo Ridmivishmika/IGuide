@@ -2,36 +2,30 @@ import { connect } from "@/lib/db";
 import { NextResponse } from "next/server";
 import Ad from "@/models/Ad";
 
-// GET all ads (public)
-export async function GET() {
+export async function PUT(req, { params }) {
   await connect();
 
   try {
-    const ads = await Ad.find({}).sort({ createdAt: -1 });
-    return NextResponse.json(ads, { status: 200 });
+    const id = params.id;
+    const body = await req.json();
+
+    const updatedAd = await Ad.findByIdAndUpdate(id, body, { new: true });
+    return NextResponse.json(updatedAd);
   } catch (error) {
-    console.error("GET /api/ad error:", error);
-    return NextResponse.json({ error: "Failed to fetch ads" }, { status: 500 });
+    console.error("PUT error:", error);
+    return NextResponse.json({ message: "PUT error" }, { status: 500 });
   }
 }
 
-// POST new ad (public - no auth)
-export async function POST(req) {
+export async function DELETE(req, { params }) {
   await connect();
 
   try {
-    const body = await req.json();
-
-    // Optional: You can validate here if needed
-    const { title, description } = body;
-    if (!title || !description) {
-      return NextResponse.json({ error: "Missing title or description" }, { status: 400 });
-    }
-
-    const newAd = await Ad.create(body);
-    return NextResponse.json(newAd, { status: 201 });
+    const id = params.id;
+    await Ad.findByIdAndDelete(id);
+    return NextResponse.json({ message: "Ad deleted" });
   } catch (error) {
-    console.error("POST /api/ad error:", error);
-    return NextResponse.json({ error: "Failed to create ad" }, { status: 500 });
+    console.error("DELETE error:", error);
+    return NextResponse.json({ message: "DELETE error" }, { status: 500 });
   }
 }

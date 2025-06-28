@@ -1,83 +1,73 @@
-/* Navbar.module.css */
-
 .navbar {
-  background-color: #640259; /* Dark Purple */
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-family: 'Inter', sans-serif;
+  width: 100%;
+  background-color: #640259;
   color: white;
+  padding: 0.5rem 1rem;
+  position: relative;
+  z-index: 10;
 }
 
 .leftSection {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-}
-.active {
-  font-weight: bold;
-  color: #640259;
-  background-color: #f9e7ff;
-  border-radius: 10px;
-  padding: 0.3rem 0.7rem;
-  box-shadow: 0 4px 8px rgba(100, 2, 89, 0.2);
-  transition: all 0.2s ease-in-out;
+  justify-content: space-between;
+  width: 100%;
 }
 
-.logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #FFFFFF;
+.logo .image {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
 }
 
+/* Hamburger icon */
+.hamburger {
+  display: none;
+  cursor: pointer;
+  color: white;
+  z-index: 20; /* ensures hamburger stays above the menu */
+}
+
+/* Navigation list */
 .navList {
   display: flex;
-  gap: 1.5rem;
   list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.navItem a {
-  text-decoration: none;
-  color: #FFFFFF;
-  font-weight: 500;
-  transition: color 0.3s ease;
-}
-
-.navItem a:hover {
-  color: #EAD6FF; /* Light Purple */
-}
-
-.rightSection {
-  display: flex;
-  align-items: center;
   gap: 1rem;
 }
 
-.loginButton {
-  background-color: #CC33CC; /* Pinkish Purple */
+.navItem a {
   color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  border: none;
-  cursor: pointer;
+  text-decoration: none;
   font-weight: 500;
-  transition: background-color 0.3s ease;
 }
 
-.loginButton:hover {
-  background-color: #E6CCFF;
-  color: #6A0DAD;
+.navItem:hover {
+  text-decoration: none;
+  /* background-color: #f1d1ee;
+  padding: 0.3rem;
+  border-radius: 2rem; */
 }
 
-.icon {
-  cursor: pointer;
-  color: white;
-  transition: color 0.3s ease;
-}
+/* MOBILE RESPONSIVENESS */
+@media (max-width: 768px) {
+  .hamburger {
+    display: block;
+  }
 
-.icon:hover {
-  color: #EAD6FF;
+  .navList {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 60px;
+    left: 50;
+    right: 0;
+    background-color: #640259;
+    padding: 1rem;
+    gap: 1rem;
+    z-index: 15; /* ensures nav menu overlays content */
+  }
+
+  .showMenu {
+    display: flex;
+  }
 }

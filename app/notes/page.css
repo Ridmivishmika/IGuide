@@ -6,7 +6,7 @@
   --card-bg: #ffffff;
 }
 
-/* Global Reset & Font */
+/* Reset and Global */
 html, body {
   height: 100%;
   margin: 0;
@@ -16,92 +16,82 @@ html, body {
   color: var(--primary);
 }
 
-/* Headings */
-h2 {
-  text-align: center;
-  color: var(--primary);
-  margin-top: 2rem;
-}
-
-/* Sidebar Layout */
+/* Layout Container */
 .pastpapers-container {
   display: flex;
   min-height: 100vh;
 }
 
+/* Sidebar */
 .sidebar {
   width: 220px;
-  min-height: 100vh;
+  padding: 2rem 1rem;
+  background-color: #fff;
+  border-right: 1px solid #eee;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 2rem 1rem;
-  background: linear-gradient(to bottom, var(--accent), var(--primary));
-  box-shadow: 4px 0 12px rgba(100, 2, 89, 0.2);
-  color: var(--text-on-dark);
+  gap: 0.5rem;
   position: sticky;
   top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+  z-index: 1500;
 }
 
-.sidebar-item, .sidebar-subitem {
-  font-size: 1.1rem;
-  font-weight: 600;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
+/* Close button inside sidebar */
+.close-btn {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  font-weight: 700;
+  padding: 0.5rem 0;
   cursor: pointer;
-  transition: background-color 0.3s, border-left 0.3s;
-  border-left: 4px solid transparent;
-  color: var(--text-on-dark);
+  color: var(--primary);
+  text-align: left;
 }
 
-.sidebar-item:hover,
-.sidebar-subitem:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+/* Sidebar items */
+.sidebar-item {
+  background-color: transparent;
+  color: var(--primary);
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  border: none;
+  text-align: left;
+  transition: background-color 0.2s;
 }
 
-.sidebar-item.active,
+.sidebar-item.active {
+  background-color: var(--primary);
+  color: white;
+}
+
+.sidebar-subitem {
+  margin: 0.5rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary);
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
 .sidebar-subitem.active {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-left: 6px solid var(--text-on-dark);
+  background-color: var(--primary);
+  color: white;
 }
 
-.language-submenu {
-  margin-left: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-/* Main Content */
+/* Main Area */
 .main-area {
   flex: 1;
   padding: 2rem;
   background-color: var(--bg-light);
-}
-
-/* Search Box */
-.search-box {
-  margin-bottom: 1.5rem;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.search-box input {
-  width: 100%;
-  max-width: 300px;
-  padding: 0.6rem 1rem;
-  font-size: 1rem;
-  border: 2px solid var(--accent);
-  border-radius: 0.6rem;
-  background-color: #fff;
-  color: var(--primary);
-  transition: 0.3s;
-}
-
-.search-box input:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(196, 62, 195, 0.3);
 }
 
 /* Cards Grid */
@@ -109,7 +99,6 @@ h2 {
   display: grid;
   gap: 2rem;
   grid-template-columns: 1fr;
-  background-color: var(--bg-light);
 }
 
 @media (min-width: 640px) {
@@ -124,39 +113,65 @@ h2 {
   }
 }
 
-/* Card */
+/* Card Styling */
 .card {
   background: var(--card-bg);
-  border: 1px solid var(--primary);
-  color: var(--primary);
-  border-radius: 1.2rem;
+  border-radius: 1.5rem;
   padding: 2rem;
+  position: relative;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   flex-direction: column;
-  position: relative;
+  align-items: center;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-5px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  font-weight: bold;
-  font-size: 150%;
+  width: 100%;
+  font-size: 1.5rem;
+  font-weight: 700;
   margin-bottom: 1rem;
+  color: var(--primary);
+  z-index: 1;
 }
 
-.card-title {
-  font-size: 1.75rem;
-  font-weight: bold;
+.cardButtons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: auto;
+  flex-wrap: wrap;
+  z-index: 1;
+}
+
+.btn {
+  padding: 0.6rem 1.2rem;
+  border: 2px solid var(--primary);
+  border-radius: 0.75rem;
+  background-color: transparent;
   color: var(--primary);
-  text-align: center;
-  margin-bottom: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.btn:hover {
+  background-color: var(--primary);
+  color: #fff;
+}
+
+.preview, .download {
+  display: flex;
+  align-items: center;
 }
 
 .watermark {
@@ -165,74 +180,14 @@ h2 {
   left: 50%;
   transform: translate(-50%, -50%) rotate(-30deg);
   font-size: 2rem;
-  font-weight: 770;
+  font-weight: 800;
   color: var(--accent);
-  opacity: 0.16;
-  z-index: 0;
+  opacity: 0.15;
   white-space: nowrap;
+  z-index: 0;
 }
 
-.cardButtons {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: auto;
-}
-
-.btn {
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  border: 2px solid var(--primary);
-  background-color: transparent;
-  color: var(--primary);
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.btn:hover {
-  background-color: var(--primary);
-  color: #fff;
-}
-
-.preview,
-.download {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-/* Note Page Styles */
-.note-page-container {
-  padding: 1rem;
-}
-
-.note-header {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
-.note-header button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.note-header button:hover {
-  background-color: #4a0143;
-}
-
+/* Form */
 form {
   max-width: 450px;
   margin: 2rem auto;
@@ -284,75 +239,83 @@ button[type="submit"]:hover {
   background-color: #4a0143;
 }
 
-p {
-  margin-top: 1rem;
-  font-size: 0.95rem;
-}
-
-p[style*="color: red"] {
-  color: #d00000 !important;
-}
-
-p[style*="color: green"] {
-  color: #1ba94c !important;
-}
-
-/* Notes List */
-.note-list {
-  max-width: 700px;
-  margin: 2rem auto;
-  background: white;
-  padding: 2rem;
-  border-radius: 1rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-}
-
-.note-list ul {
-  list-style: none;
-  padding: 0;
-}
-
-.note-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  border-bottom: 1px solid #eee;
-  padding: 0.75rem 0;
-}
-
-.note-item p {
-  margin: 0;
-  font-weight: 500;
-  flex: 1;
-}
-
-.note-item a {
-  color: var(--primary);
-  font-weight: bold;
-  margin-right: 1rem;
-  text-decoration: none;
-}
-
-.note-item a:hover {
-  text-decoration: underline;
-}
-
-.note-item button {
-  background: transparent;
-  border: none;
-  color: var(--primary);
-  cursor: pointer;
-  font-size: 1rem;
-  transition: color 0.2s ease;
-}
-
-.note-item button:hover {
-  color: var(--accent);
-}
-
-/* Text Selection */
+/* Selection */
 ::selection {
   background: var(--accent);
   color: white;
+}
+
+/* Hamburger button container - visible only on small screens */
+.hamburger-wrapper {
+  display: none; /* hidden on desktop */
+  position: fixed;
+  top: 1%rem;
+  left: 1rem;
+  z-index: 2000;
+    margin: 0.5rem 1rem; /* add margin to position below navbar */
+}
+
+/* Hamburger icon style */
+.hamburger-icon {
+  cursor: pointer;
+  color: var(--primary);
+  background: var(--bg-light);
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Small screens: show hamburger, hide sidebar by default */
+@media (max-width: 767px) {
+  .hamburger-wrapper {
+    display: block;
+  }
+
+  /* Hide sidebar off-canvas by default */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    transform: translateX(-100%);
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15);
+    border-right: none;
+    padding-top: 3rem;
+    background-color: white;
+  }
+
+  /* Show sidebar when visible class is added */
+  .sidebar.visible {
+    transform: translateX(0);
+  }
+
+  /* Show close button inside sidebar on mobile */
+  .sidebar.visible .close-btn {
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  /* Main area full width on mobile */
+  .main-area {
+    padding: 1rem;
+  }
+}
+
+/* Larger screens - sidebar always visible */
+@media (min-width: 768px) {
+  .hamburger-wrapper {
+    display: none;
+  }
+  
+  .sidebar {
+    position: sticky;
+    transform: none !important;
+    height: 100vh;
+    box-shadow: none;
+    border-right: 1px solid #eee;
+    padding-top: 2rem;
+  }
 }

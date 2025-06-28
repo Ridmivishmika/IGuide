@@ -6,26 +6,26 @@ import { connect } from "@/lib/db";
 import { verifyToken } from "@/lib/verifyToken";
 
 // Helper: Check if JWT token is valid
-async function checkAuth(req) {
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) return false;
-  const token = authHeader.split(" ")[1];
-  try {
-    const decoded = verifyToken(token);
-    return !!decoded;
-  } catch {
-    return false;
-  }
-}
+// async function checkAuth(req) {
+//   const authHeader = req.headers.get("authorization");
+//   if (!authHeader || !authHeader.startsWith("Bearer ")) return false;
+//   const token = authHeader.split(" ")[1];
+//   try {
+//     const decoded = verifyToken(token);
+//     return !!decoded;
+//   } catch {
+//     return false;
+//   }
+// }
 
 // ✅ POST: Create a new note (requires JWT auth)
 export async function POST(req) {
   await connect();
 
-  const authorized = await checkAuth(req);
-  if (!authorized) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  // const authorized = await checkAuth(req);
+  // if (!authorized) {
+  //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // }
 
   try {
     const body = await req.json();

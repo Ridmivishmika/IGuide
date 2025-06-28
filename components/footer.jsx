@@ -1,26 +1,24 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Input from "./Input";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
-import styles from "./LoginForm.module.css";
-
-
+import React from "react";
+import styles from "./Footer.module.css";
+import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn, FaYoutube } from "react-icons/fa";
 
 const Footer = () => {
-  
- 
   return (
-    <div>
-        <p>Facebook</p>
-        <p>Youtube</p>
-        <p>design by : ..... @copyright 2025 june</p>
-
-    </div>
-    
-
+    <footer className={styles.footer}>
+      <h2 className={styles.title}>iGuide</h2>
+      <p className={styles.subtitle}>
+        Empowering the next generation of legal minds through quality academic resources.
+      </p>
+      <div className={styles.socialIcons}>
+        <a href="https://www.facebook.com/iGuidelk?mibextid=ZbWKwL" aria-label="Facebook"><FaFacebookF /></a>
+        <a href="https://youtube.com/@iguideelearning?si=VyLfhtsU1-j-oz4x" aria-label="YouTube"><FaYoutube /></a>
+      </div>
+      <p className={styles.copyright}>
+        Design by  · © 2025 June
+      </p>
+    </footer>
   );
 };
 

@@ -111,34 +111,25 @@ const AddNoteForm = () => {
         note: noteData ? noteData : editingId ? undefined : null,
       };
 
-      let response;
+      
+const res = await fetch(editingId ? `/api/note/${editingId}` : "/api/note", {
+        method: editingId ? "PATCH" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // Removed Authorization header
+        },
+        body: JSON.stringify(payload),
+      });
+      
 
-      if (editingId) {
-        response = await fetch(`/api/note/${editingId}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-      } else {
-        response = await fetch("/api/note", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-      }
-
-      if (response.ok) {
+      if (res.ok) {
         setSuccess(editingId ? "Note updated successfully" : "Note added successfully");
         setState(initialState);
         setEditingId(null);
         fetchNotes();
-        setTimeout(() => {
-          router.refresh();
-        }, 1500);
+                router.push("/notes");
+
+       
       } else {
         setError(editingId ? "Failed to update note" : "Failed to add note");
       }

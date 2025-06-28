@@ -128,7 +128,8 @@ const AddPastPaper = () => {
         setState(initialState);
         setEditingId(null);
         fetchPapers();
-        setTimeout(() => router.refresh(), 1500);
+       router.push("/pastpapers"); // Navigate to /notes after success
+  return;
       } else {
         setError("Failed to save past paper");
       }
